@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "aerobeat_gameplay_runner",
+  "project_id": "bd88f37a-562a-49db-b19a-e3feb00f75a9"
+}
