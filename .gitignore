@@ -1,5 +1,60 @@
+# Godot 4+ specific ignores
+.godot/
+.import/
+export.cfg
+export_presets.cfg
 
-# Beads / Dolt files (added by bd init)
+# Imported translations
+*.translation
+
+# Mono-specific ignores
+.mono/
+data_*/
+!src/data_types/
+mono_crash.*.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# System
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+env/
+.testbed/venv/
+
+# Build and test artifacts
+build/
+dist/
+*.tmp
+test_report*.json
+.temp/
+.artifacts/
+.testbed/test-results/
+
+# GodotEnv package workbench
+.testbed/addons/*
+!.testbed/addons/.editorconfig
+.testbed/.addons/
+.testbed/.headless/
+.testbed/.testbed/
+
+# Beads / Dolt files
 .dolt/
 *.db
 .beads-credential-key
+
+# Generated agent files
+.claude/
+CLAUDE.md
+AGENTS.md

@@ -1,0 +1,24 @@
+config_version=5
+
+[application]
+
+config/name="AeroBeat Gameplay Runner Testbed"
+run/main_scene="res://scenes/gameplay_runner_testbed.tscn"
+config/features=PackedStringArray("4.6", "Forward Plus")
+
+[autoload]
+
+AeroHeadlessManager="*res://addons/aerobeat-tool-headless-manager/src/AeroHeadlessManager.gd"
+AeroGameplayRunner="*res://addons/aerobeat-gameplay-runner/src/AeroGameplayRunner.gd"
+
+[debug]
+
+gdscript/warnings/untyped_declaration=1
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/aerobeat-vendor-godot-unit-test/plugin.cfg")
+
+[rendering]
+
+renderer/rendering_method="forward_plus"
