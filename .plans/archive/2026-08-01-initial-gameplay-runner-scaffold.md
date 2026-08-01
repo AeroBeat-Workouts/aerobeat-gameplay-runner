@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-01
 **Status:** Complete
-**Last Updated:** 2026-08-01 16:10 America/New_York
+**Last Updated:** 2026-08-01 18:47 America/New_York
 **Blocked Reason:** None
 **Agent:** subagent coder
 
@@ -52,4 +52,7 @@ The root intentionally does not include `project.godot`, `addons.jsonc`, showcas
 
 **Reference Check:** Satisfied `REF-01` root-vs-testbed split and `REF-02` CI/GodotEnv restore shape. `godotenv addons install`, `godot --headless --path .testbed --import`, and GUT contract test were run locally.
 
-**Commits:** Pending initial scaffold commit.
+**Commits:**
+- `a862f27` - Create gameplay runner scaffold
+
+*Completed on 2026-08-01*
