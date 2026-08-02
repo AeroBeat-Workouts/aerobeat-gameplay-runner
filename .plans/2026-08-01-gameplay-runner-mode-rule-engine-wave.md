@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-01  
 **Status:** Draft  
-**Last Updated:** 2026-08-01 22:03 EDT  
-**Blocked Reason:** High-level phase order approved; waiting on detailed runner envelope discussion and later architecture freeze approvals before implementation.  
+**Last Updated:** 2026-08-01 22:06 EDT  
+**Blocked Reason:** High-level phase order and runner/mode-core envelope split approved; waiting on later architecture freeze approvals before implementation.  
 **Agent:** pico
 
 ---
@@ -60,7 +60,7 @@ Implement only the contract minimum needed for rule engines and runner integrati
 
 - Add or adjust `aerobeat-mode-core` DTOs/interfaces for mode identity, chart object handoff, mode runner lifecycle, judgement events, score deltas, run result fragments, and test fixtures.
 - Correct `aerobeat-input-core` Boxing punch signals from `signal straight_left(power: float)` style to no-scalar active events.
-- Decide whether runner envelopes live in `aerobeat-gameplay-runner` or `aerobeat-mode-core`.
+- Keep portable mode contracts and mode-produced result fragments in `aerobeat-mode-core`; keep session-level envelopes, clock/timeline orchestration state, aggregation, and testbed transport in `aerobeat-gameplay-runner`.
 - Keep camera-tracking debug payloads provider/testbed-local.
 
 ### Phase 2: Harden Gameplay Runner
@@ -123,7 +123,7 @@ Only after runner `.testbed` passes:
 ## Approval Notes
 
 - 2026-08-01: Derrick approved the high-level phase order for risk reduction.
-- 2026-08-01: Runner envelope ownership remains open for detailed simple/technical discussion before freeze.
+- 2026-08-01: Derrick approved the split where `aerobeat-mode-core` owns portable mode contracts and mode-produced result fragments, while `aerobeat-gameplay-runner` owns session-level envelopes, clock/timeline orchestration state, aggregation, and testbed transport.
 - 2026-08-01: Boxing punch input correction is approved as signal-with-no-args; v1 punch events do not carry `power`, `strength`, scalar intensity, or an explicit `active` boolean.
 - 2026-08-01: First fake input streams should be runner-owned test infrastructure. `aerobeat-input-core` remains contract-only for this seam.
 - 2026-08-01: BeatSaver regression fixtures will wait for Derrick-provided BeatSaver IDs from songs he already knows by feel from Shadowboxr and Hit Beat on Meta Quest.
@@ -148,7 +148,7 @@ Only after runner `.testbed` passes:
 
 **Status:** ⏳ In Progress
 
-**Results:** Draft plan created for Derrick review. Derrick approved the high-level phase order and answered input-shape, fake-stream ownership, and BeatSaver fixture-source questions. Runner envelope ownership remains open for detailed discussion.
+**Results:** Draft plan created for Derrick review. Derrick approved the high-level phase order, runner/mode-core envelope split, input-shape decision, fake-stream ownership, and BeatSaver fixture-source approach.
 
 ---
 
