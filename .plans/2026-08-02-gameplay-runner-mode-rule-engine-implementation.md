@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-02  
 **Status:** Draft  
-**Last Updated:** 2026-08-02 08:43 EDT  
+**Last Updated:** 2026-08-02 08:58 EDT  
 **Blocked Reason:** Awaiting Derrick approval to execute this new implementation plan  
 **Agent:** pico
 
@@ -40,6 +40,8 @@ The first implementation beads already exist from the previous session. Some adj
 | `REF-10` | Flow mode repo | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-flow/README.md` |
 | `REF-11` | Content contract repo | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core/README.md` |
 | `REF-12` | Audio clock source repo | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-tool-audio-player/README.md` |
+| `REF-13` | GodotEnv sync helper | `/home/derrick/.openclaw/workspace/scripts/godotenv-sync` |
+| `REF-14` | AeroBeat GodotEnv convention contract | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-docs/docs/architecture/godotenv-convention-contract.md` |
 
 ---
 
@@ -52,6 +54,7 @@ The first implementation beads already exist from the previous session. Some adj
 - Flow v1 primarily consumes `BodyCellInput` events: `left_wrist_cell_entered(cell, direction)`, `right_wrist_cell_entered(cell, direction)`, `nose_cell_entered(cell, direction)`, and `calibration_session_updated(session)`, plus optional Flow squat transitions.
 - Runner production clock consumption is limited to `reset()`, `get_position_sec()`, `get_duration_sec()`, `get_state()`, and `is_complete()`. Audio timing truth remains in `aerobeat-tool-audio-player`.
 - Tiny contract/rule fixtures land before BeatSaver-derived regression fixtures. BeatSaver fixtures use Derrick's approved pool from `REF-02`.
+- GodotEnv dependency manifest or installed-addon updates must use the workspace sync helper from `REF-13`, targeting the repo or `.testbed` project root being changed. Use the helper's safe default path unless the plan/bead explicitly calls for `--dry-run`, `--refresh-caches`, or another documented option; do not manually patch generated installed addon state or rely on raw `godotenv addons install` as the primary update path.
 
 ---
 
@@ -82,8 +85,8 @@ The first implementation beads already exist from the previous session. Some adj
 **Bead ID:** `afc-z8o`  
 **SubAgent:** `primary`  
 **Role:** `coder`  
-**References:** `REF-01`, `REF-02`, `REF-06`  
-**Prompt:** Claim bead `afc-z8o` with `bd update afc-z8o --claim --json` at start. In the `coder` role on `primary`, implement the approved portable mode-core v1 contract minimum: mode descriptor/config, mode runner lifecycle, tick frame, mode event/judgement/score/run fragments, and tiny contract fixtures/tests using repo-local conventions. Keep session envelopes, clocks, fake streams, testbed transport, camera/provider debug payloads, and assembly concerns out of mode-core. Run relevant repo tests and validation, perform any required Godot fresh-open/log pass if runtime scenes or Godot UI paths are touched, then commit and push. Do not close the bead unless the implementation and validation are complete.
+**References:** `REF-01`, `REF-02`, `REF-06`, `REF-13`, `REF-14`  
+**Prompt:** Claim bead `afc-z8o` with `bd update afc-z8o --claim --json` at start. In the `coder` role on `primary`, implement the approved portable mode-core v1 contract minimum: mode descriptor/config, mode runner lifecycle, tick frame, mode event/judgement/score/run fragments, and tiny contract fixtures/tests using repo-local conventions. Keep session envelopes, clocks, fake streams, testbed transport, camera/provider debug payloads, and assembly concerns out of mode-core. If dependency manifests or installed GodotEnv addon state must change, use `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo <repo-or-testbed-root>` per `REF-13`/`REF-14` and report the exact target. Run relevant repo tests and validation, perform any required Godot fresh-open/log pass if runtime scenes or Godot UI paths are touched, then commit and push. Do not close the bead unless the implementation and validation are complete.
 
 **Folders Created/Deleted/Modified:**
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-core/`
@@ -136,8 +139,8 @@ The first implementation beads already exist from the previous session. Some adj
 **Bead ID:** `aerobeat-input-core-6xl`  
 **SubAgent:** `primary`  
 **Role:** `coder`  
-**References:** `REF-01`, `REF-02`, `REF-07`, `REF-08`  
-**Prompt:** Claim bead `aerobeat-input-core-6xl` with `bd update aerobeat-input-core-6xl --claim --json` at start. In the `coder` role on `primary`, update `BoxingInput` and `InputManager` proxy punch signals/callbacks to exact no-arg active events for straight/hook/uppercut left/right. Remove power/scalar forwarding and do not add active booleans or intensity fields. Update focused tests/docs where available, run repo validation, perform any required Godot fresh-open/log pass if runtime scenes or Godot UI paths are touched, then commit and push. Do not close the bead unless implementation and validation are complete.
+**References:** `REF-01`, `REF-02`, `REF-07`, `REF-08`, `REF-13`, `REF-14`  
+**Prompt:** Claim bead `aerobeat-input-core-6xl` with `bd update aerobeat-input-core-6xl --claim --json` at start. In the `coder` role on `primary`, update `BoxingInput` and `InputManager` proxy punch signals/callbacks to exact no-arg active events for straight/hook/uppercut left/right. Remove power/scalar forwarding and do not add active booleans or intensity fields. Update focused tests/docs where available. If dependency manifests or installed GodotEnv addon state must change, use `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo <repo-or-testbed-root>` per `REF-13`/`REF-14` and report the exact target. Run repo validation, perform any required Godot fresh-open/log pass if runtime scenes or Godot UI paths are touched, then commit and push. Do not close the bead unless implementation and validation are complete.
 
 **Folders Created/Deleted/Modified:**
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/`
@@ -185,8 +188,8 @@ The first implementation beads already exist from the previous session. Some adj
 **Bead ID:** `aerobeat-gameplay-runner-snf`  
 **SubAgent:** `primary`  
 **Role:** `coder`  
-**References:** `REF-01`, `REF-02`, `REF-04`, `REF-05`, `REF-12`  
-**Prompt:** Claim bead `aerobeat-gameplay-runner-snf` with `bd update aerobeat-gameplay-runner-snf --claim --json` at start, after `afc-z8o` and `aerobeat-input-core-6xl` are complete. In the `coder` role on `primary`, adopt the new mode-core mode runner/event/judgement/score fragments, switch `GameplayTimelineClock` production seam to `reset/get_position_sec/get_duration_sec/get_state/is_complete`, add runner-owned fake input stream envelopes that mirror input-core signal contracts, and cover lifecycle, dispatch order, terminal states, and aggregation with focused tests. Keep audio clock truth in `aerobeat-tool-audio-player` and keep fake clocks as runner test infrastructure. Run repo validation and Godot fresh-open/log inspection for the `.testbed` or runtime scene seam if touched, then commit and push. Do not close the bead unless implementation and validation are complete.
+**References:** `REF-01`, `REF-02`, `REF-04`, `REF-05`, `REF-12`, `REF-13`, `REF-14`  
+**Prompt:** Claim bead `aerobeat-gameplay-runner-snf` with `bd update aerobeat-gameplay-runner-snf --claim --json` at start, after `afc-z8o` and `aerobeat-input-core-6xl` are complete. In the `coder` role on `primary`, adopt the new mode-core mode runner/event/judgement/score fragments, switch `GameplayTimelineClock` production seam to `reset/get_position_sec/get_duration_sec/get_state/is_complete`, add runner-owned fake input stream envelopes that mirror input-core signal contracts, and cover lifecycle, dispatch order, terminal states, and aggregation with focused tests. Keep audio clock truth in `aerobeat-tool-audio-player` and keep fake clocks as runner test infrastructure. If `.testbed/addons.jsonc` or installed GodotEnv addon state must change, use `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo /home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed` per `REF-13`/`REF-14` and report the exact command. Run repo validation and Godot fresh-open/log inspection for the `.testbed` or runtime scene seam if touched, then commit and push. Do not close the bead unless implementation and validation are complete.
 
 **Folders Created/Deleted/Modified:**
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/`
@@ -233,8 +236,8 @@ The first implementation beads already exist from the previous session. Some adj
 **Bead ID:** `aerobeat-mode-boxing-hz4`  
 **SubAgent:** `primary`  
 **Role:** `coder`  
-**References:** `REF-01`, `REF-02`, `REF-09`  
-**Prompt:** Claim bead `aerobeat-mode-boxing-hz4` with `bd update aerobeat-mode-boxing-hz4 --claim --json` at start, after `afc-z8o` and `aerobeat-input-core-6xl` are complete. In the `coder` role on `primary`, implement a pure Boxing v1 mode runner over normalized no-arg Boxing events: straight/hook/uppercut left/right, guard, squat, and weave transitions. Evaluate authored targets against timing windows and tiny fake input fixtures; emit mode-core judgement/score/run fragments. Do not depend on runner, camera, raw landmarks, detector payloads, UI shell, or assembly. Run repo validation and any relevant Godot fresh-open/log pass, then commit and push. Do not close the bead unless implementation and validation are complete.
+**References:** `REF-01`, `REF-02`, `REF-09`, `REF-13`, `REF-14`  
+**Prompt:** Claim bead `aerobeat-mode-boxing-hz4` with `bd update aerobeat-mode-boxing-hz4 --claim --json` at start, after `afc-z8o` and `aerobeat-input-core-6xl` are complete. In the `coder` role on `primary`, implement a pure Boxing v1 mode runner over normalized no-arg Boxing events: straight/hook/uppercut left/right, guard, squat, and weave transitions. Evaluate authored targets against timing windows and tiny fake input fixtures; emit mode-core judgement/score/run fragments. Do not depend on runner, camera, raw landmarks, detector payloads, UI shell, or assembly. If `.testbed/addons.jsonc` or installed GodotEnv addon state must change, use `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo /home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-boxing/.testbed` per `REF-13`/`REF-14` and report the exact command. Run repo validation and any relevant Godot fresh-open/log pass, then commit and push. Do not close the bead unless implementation and validation are complete.
 
 **Folders Created/Deleted/Modified:**
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-boxing/`
@@ -281,8 +284,8 @@ The first implementation beads already exist from the previous session. Some adj
 **Bead ID:** `aerobeat-mode-flow-346`  
 **SubAgent:** `primary`  
 **Role:** `coder`  
-**References:** `REF-01`, `REF-02`, `REF-10`  
-**Prompt:** Claim bead `aerobeat-mode-flow-346` with `bd update aerobeat-mode-flow-346 --claim --json` at start, after `afc-z8o` is complete. In the `coder` role on `primary`, implement a pure Flow v1 mode runner over `BodyCellInput` events plus Flow squat transitions. Cover left/right wrist hits, direction-required and directionless notes, nose/obstacle semantics if retained, tiny fake input fixtures, and mode-core judgement/score/run fragments. Do not depend on runner, camera, raw landmarks, detector payloads, UI shell, or assembly. Run repo validation and any relevant Godot fresh-open/log pass, then commit and push. Do not close the bead unless implementation and validation are complete.
+**References:** `REF-01`, `REF-02`, `REF-10`, `REF-13`, `REF-14`  
+**Prompt:** Claim bead `aerobeat-mode-flow-346` with `bd update aerobeat-mode-flow-346 --claim --json` at start, after `afc-z8o` is complete. In the `coder` role on `primary`, implement a pure Flow v1 mode runner over `BodyCellInput` events plus Flow squat transitions. Cover left/right wrist hits, direction-required and directionless notes, nose/obstacle semantics if retained, tiny fake input fixtures, and mode-core judgement/score/run fragments. Do not depend on runner, camera, raw landmarks, detector payloads, UI shell, or assembly. If `.testbed/addons.jsonc` or installed GodotEnv addon state must change, use `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo /home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-flow/.testbed` per `REF-13`/`REF-14` and report the exact command. Run repo validation and any relevant Godot fresh-open/log pass, then commit and push. Do not close the bead unless implementation and validation are complete.
 
 **Folders Created/Deleted/Modified:**
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-flow/`
@@ -329,8 +332,8 @@ The first implementation beads already exist from the previous session. Some adj
 **Bead ID:** `aerobeat-content-core-xba`  
 **SubAgent:** `primary`  
 **Role:** `coder`  
-**References:** `REF-02`, `REF-11`  
-**Prompt:** Claim bead `aerobeat-content-core-xba` with `bd update aerobeat-content-core-xba --claim --json` at start, after tiny mode/runner contracts pass. In the `coder` role on `primary`, convert Derrick's approved BeatSaver candidate pool from `REF-02` into content-core song-package/chart regression fixtures. Preserve group intent for Sonic speed, K-Pop and Game Grumps/NSP simpler references, and Linkin Park mid-level Expert baseline. Validate through content-core contracts before runner or mode tests consume them. Run repo validation and any relevant Godot fresh-open/log pass, then commit and push. Do not close the bead unless implementation and validation are complete.
+**References:** `REF-02`, `REF-11`, `REF-13`, `REF-14`  
+**Prompt:** Claim bead `aerobeat-content-core-xba` with `bd update aerobeat-content-core-xba --claim --json` at start, after tiny mode/runner contracts pass. In the `coder` role on `primary`, convert Derrick's approved BeatSaver candidate pool from `REF-02` into content-core song-package/chart regression fixtures. Preserve group intent for Sonic speed, K-Pop and Game Grumps/NSP simpler references, and Linkin Park mid-level Expert baseline. Validate through content-core contracts before runner or mode tests consume them. If `.testbed/addons.jsonc` or installed GodotEnv addon state must change, use `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo /home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core/.testbed` per `REF-13`/`REF-14` and report the exact command. Run repo validation and any relevant Godot fresh-open/log pass, then commit and push. Do not close the bead unless implementation and validation are complete.
 
 **Folders Created/Deleted/Modified:**
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core/`
@@ -377,8 +380,8 @@ The first implementation beads already exist from the previous session. Some adj
 **Bead ID:** `aerobeat-gameplay-runner-yij`  
 **SubAgent:** `primary`  
 **Role:** `coder`  
-**References:** `REF-01`, `REF-02`, `REF-04`, `REF-05`, `REF-09`, `REF-10`, `REF-11`  
-**Prompt:** Claim bead `aerobeat-gameplay-runner-yij` with `bd update aerobeat-gameplay-runner-yij --claim --json` at start, after runner contract adoption, Boxing engine, Flow engine, and BeatSaver fixture conversion are complete. In the `coder` role on `primary`, compose `aerobeat-gameplay-runner/.testbed` with runner, mode-core, content-core, input-core, Boxing, and Flow engines. Run tiny fixture songs with fake clocks/input streams first, then BeatSaver-converted regression fixtures. Validate headless import/GUT where possible and perform fresh Godot scene-open/log inspection for this runtime testbed seam. Resolve unexpected warnings/errors or document accepted exceptions, then commit and push. Do not close the bead unless implementation and validation are complete.
+**References:** `REF-01`, `REF-02`, `REF-04`, `REF-05`, `REF-09`, `REF-10`, `REF-11`, `REF-13`, `REF-14`  
+**Prompt:** Claim bead `aerobeat-gameplay-runner-yij` with `bd update aerobeat-gameplay-runner-yij --claim --json` at start, after runner contract adoption, Boxing engine, Flow engine, and BeatSaver fixture conversion are complete. In the `coder` role on `primary`, compose `aerobeat-gameplay-runner/.testbed` with runner, mode-core, content-core, input-core, Boxing, and Flow engines. Use `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo /home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed` per `REF-13`/`REF-14` for dependency manifest/install updates and report the exact command. Run tiny fixture songs with fake clocks/input streams first, then BeatSaver-converted regression fixtures. Validate headless import/GUT where possible and perform fresh Godot scene-open/log inspection for this runtime testbed seam. Resolve unexpected warnings/errors or document accepted exceptions, then commit and push. Do not close the bead unless implementation and validation are complete.
 
 **Folders Created/Deleted/Modified:**
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed/`
