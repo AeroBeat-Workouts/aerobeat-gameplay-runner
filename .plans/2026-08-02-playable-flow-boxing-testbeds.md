@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-02  
 **Status:** In Progress  
-**Last Updated:** 2026-08-02 19:28 EDT
+**Last Updated:** 2026-08-02 19:42 EDT
 **Blocked Reason:** None  
 **Agent:** pico
 
@@ -338,7 +338,7 @@ Before QA and audit can pass, the coder/QA evidence must include:
 
 **Status:** ⏳ In Progress
 
-**Results:** Execution beads created. Cross-repo dependencies could not be represented with local `bd dep add`, so dependency order is recorded in bead notes and enforced by orchestration. The input-core contract seam passed QA/audit and closed `aerobeat-input-core-ij5`; the camera-tracking body-grid anchor seam passed implementation/QA/audit and closed `oc-zex8`. The next unblocked seam is runner implementation on `aerobeat-gameplay-runner-an1`.
+**Results:** Execution beads created. Cross-repo dependencies could not be represented with local `bd dep add`, so dependency order is recorded in bead notes and enforced by orchestration. The input-core contract seam passed QA/audit and closed `aerobeat-input-core-ij5`; the camera-tracking body-grid anchor seam passed implementation/QA/audit and closed `oc-zex8`. Runner implementation landed in commit `c1bb79a` with playable Flow and Boxing `.testbed` scenes, runner-owned `assets/playable_testbed.yaml`, `PlayfieldMapper`, shared playable harness/adapters, FileDialog song/environment selection, dummy hit SFX, generated mesh/debug visuals, and GodotEnv dependencies wired into the testbed. Coder validation passed targeted GUT (`11` tests, `174` assertions), fresh headless Flow and Boxing scene opens, GodotEnv sync, and class-name collision scan. Accepted manual gaps remain for QA: live camera/T-pose behavior, GUI FileDialog song/environment selection, supported environment display proof, hit gesture/SFX proof, recalibration pause/resume, and completion summary behavior.
 
 ---
 
@@ -346,12 +346,12 @@ Before QA and audit can pass, the coder/QA evidence must include:
 
 **Status:** ⚠️ Partial
 
-**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is now the next active seam.
+**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is committed and pushed; QA is now the next active seam for manual/high-fidelity playable validation.
 
 **Reference Check:** Subagent reviews completed against referenced repos. The final readiness audit passed after freeze edits and closed `aerobeat-gameplay-runner-7l8`.
 
 **Commits:**
-- Runner implementation pending on `aerobeat-gameplay-runner-an1`.
+- Runner QA pending on `aerobeat-gameplay-runner-an1`.
 
 **Lessons Learned:** Pending.
 
