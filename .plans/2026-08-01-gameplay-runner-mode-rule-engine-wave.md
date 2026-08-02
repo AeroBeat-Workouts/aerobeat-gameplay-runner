@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-01  
 **Status:** Draft  
-**Last Updated:** 2026-08-01 21:46 EDT  
-**Blocked Reason:** Waiting for Derrick's high-level approval and later architecture freeze approvals before implementation.  
+**Last Updated:** 2026-08-01 22:03 EDT  
+**Blocked Reason:** High-level phase order approved; waiting on detailed runner envelope discussion and later architecture freeze approvals before implementation.  
 **Agent:** pico
 
 ---
@@ -120,6 +120,14 @@ Only after runner `.testbed` passes:
 4. Should the first fake input stream be runner-owned test infrastructure or live in `aerobeat-input-core` as shared test utilities?
 5. Which BeatSaver-converted maps should be the first full-run regression fixtures, or should we start with any tiny converted map and swap later?
 
+## Approval Notes
+
+- 2026-08-01: Derrick approved the high-level phase order for risk reduction.
+- 2026-08-01: Runner envelope ownership remains open for detailed simple/technical discussion before freeze.
+- 2026-08-01: Boxing punch input correction is approved as signal-with-no-args; v1 punch events do not carry `power`, `strength`, scalar intensity, or an explicit `active` boolean.
+- 2026-08-01: First fake input streams should be runner-owned test infrastructure. `aerobeat-input-core` remains contract-only for this seam.
+- 2026-08-01: BeatSaver regression fixtures will wait for Derrick-provided BeatSaver IDs from songs he already knows by feel from Shadowboxr and Hit Beat on Meta Quest.
+
 ---
 
 ## Tasks
@@ -138,9 +146,9 @@ Only after runner `.testbed` passes:
 **Files Created/Deleted/Modified:**
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.plans/2026-08-01-gameplay-runner-mode-rule-engine-wave.md`
 
-**Status:** ⏳ Pending
+**Status:** ⏳ In Progress
 
-**Results:** Draft plan created for Derrick review.
+**Results:** Draft plan created for Derrick review. Derrick approved the high-level phase order and answered input-shape, fake-stream ownership, and BeatSaver fixture-source questions. Runner envelope ownership remains open for detailed discussion.
 
 ---
 
