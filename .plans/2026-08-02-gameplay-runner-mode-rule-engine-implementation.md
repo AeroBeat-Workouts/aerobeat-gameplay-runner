@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-02  
 **Status:** In Progress  
-**Last Updated:** 2026-08-02 10:41 EDT  
+**Last Updated:** 2026-08-02 10:53 EDT  
 **Blocked Reason:** None  
 **Agent:** pico
 
@@ -326,11 +326,18 @@ The first implementation beads already exist from the previous session. Some adj
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-flow/`
 
 **Files Created/Deleted/Modified:**
-- Pending
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-flow/.testbed/addons.jsonc`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-flow/.testbed/tests/test_flow_mode_runner.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-flow/.testbed/tests/test_flow_mode_runner.gd.uid`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-flow/.testbed/tests/test_example.gd` deleted
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-flow/.testbed/tests/test_example.gd.uid` deleted
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-flow/README.md`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-flow/src/flow_mode_runner.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-flow/src/flow_mode_runner.gd.uid`
 
-**Status:** ⏳ In Progress
+**Status:** ✅ Complete
 
-**Results:** `primary` coder spawned for Flow pure rule-engine implementation after mode-core completion.
+**Results:** PASS pending QA/audit. `primary` coder implemented the pure Flow v1 mode runner in commit `44fd778`, pushed to `main`. The runner consumes mode-core `ModeRunConfig`, `ModeTickFrame`, `ModeJudgementEvent`, `ModeScoreDelta`, and `ModeRunFragment`; supports BodyCellInput left/right wrist cell-entry notes with direction-required and directionless matching, nose obstacle avoidance, bomb wrist avoidance, Flow `squat_enabled`/`squat_disabled` transitions, and retained burst/arc wrist-hit semantics. The placeholder test was replaced with tiny GUT fixtures covering descriptor/input contracts, left/right wrist hits, direction mismatch, directionless ambiguous direction, early/late/miss timing, nose obstacle clear/contact, squat transitions, burst/arc/bomb retained semantics, invalid body-cell args, scoring, combo, and completion. Manifest changed to include the self addon for testbed preloads. GodotEnv sync was run with `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo /home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-flow/.testbed`. Validation reported by coder: GodotEnv sync passed, headless import passed with accepted vendored GUT invalid-UID warnings and accepted headless ObjectDB shutdown warning, GUT passed 9/9 tests with 40 assertions, and bounded headless editor fresh-open passed with accepted vendored GUT invalid-UID warnings, scan-thread-aborted-on-quit warning, and accepted ObjectDB shutdown warning. Scope scan found no gameplay runner, session/clock/fake-stream, camera provider, raw landmark, detector payload, UI shell, or assembly dependency outside README's explicit exclusion sentence. Parent verification confirmed `44fd778` is pushed to `main`, mode-flow is clean, and bead `aerobeat-mode-flow-346` remains `in_progress` for QA/audit.
 
 ---
 
