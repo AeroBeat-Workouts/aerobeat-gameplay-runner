@@ -271,11 +271,18 @@ The first implementation beads already exist from the previous session. Some adj
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-boxing/`
 
 **Files Created/Deleted/Modified:**
-- Pending
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-boxing/.testbed/addons.jsonc`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-boxing/.testbed/tests/test_boxing_mode_runner.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-boxing/.testbed/tests/test_boxing_mode_runner.gd.uid`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-boxing/.testbed/tests/test_example.gd` deleted
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-boxing/.testbed/tests/test_example.gd.uid` deleted
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-boxing/README.md`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-boxing/src/boxing_mode_runner.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-boxing/src/boxing_mode_runner.gd.uid`
 
-**Status:** ⏳ In Progress
+**Status:** ✅ Complete
 
-**Results:** Prerequisite beads `afc-z8o` and `aerobeat-input-core-6xl` are closed, Boxing git is clean on `main`, and `aerobeat-mode-boxing-hz4` is open for coder implementation.
+**Results:** PASS pending QA/audit. `primary` coder implemented the pure Boxing v1 mode runner in commit `78e8c5e2ea12cc8b5470d35ed3391195b4c93451`, pushed to `main`. The runner consumes mode-core `ModeRunConfig`, `ModeTickFrame`, `ModeJudgementEvent`, `ModeScoreDelta`, and `ModeRunFragment`; supports no-arg straight/hook/uppercut left/right punch events plus guard/squat/weave transitions; applies early/late timing windows; emits hit/early/late/miss judgements, score deltas, combo reset/recovery deltas, summaries, and completion/stop fragments; and stays mode-local without gameplay-runner, camera, raw landmark, detector payload, UI shell, or assembly dependency. The placeholder test was replaced with focused GUT fixtures for descriptor/no-arg punch contract, hit, miss, early, late, combo recovery/reset, defensive transitions, completion, and rejection of punch args. GodotEnv sync was run with `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo /home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-boxing/.testbed`. Validation reported by coder and repeated by Pico: GodotEnv sync passed, headless import passed with accepted vendored GUT invalid-UID warnings and accepted headless ObjectDB leak warning, and GUT passed 7/7 tests with 35 assertions. Coder also ran a bounded headless editor fresh-open/log pass with only accepted vendored GUT invalid-UID warnings, scan-thread-aborted-on-quit warning, and headless ObjectDB leak warning. Bead `aerobeat-mode-boxing-hz4` remains `in_progress` for QA/audit.
 
 ---
 
@@ -287,9 +294,9 @@ The first implementation beads already exist from the previous session. Some adj
 **References:** `REF-01`, `REF-02`, `REF-09`  
 **Prompt:** With bead `aerobeat-mode-boxing-hz4` still active, independently verify the Boxing engine is pure, consumes the frozen no-arg input events, emits mode-core fragments, covers hit/miss/early/late/combo/completion fixture behavior, and has no runner/camera/UI/assembly dependency. Run the highest-fidelity repo validation available and repeat any relevant Godot fresh-open/log pass. Report pass/fail; do not close the bead.
 
-**Status:** ⏳ Pending
+**Status:** ⏳ In Progress
 
-**Results:** Pending.
+**Results:** Pending QA completion.
 
 ---
 
