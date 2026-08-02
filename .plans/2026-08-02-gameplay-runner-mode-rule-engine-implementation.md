@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-02  
 **Status:** In Progress  
-**Last Updated:** 2026-08-02 09:52 EDT  
+**Last Updated:** 2026-08-02 09:59 EDT  
 **Blocked Reason:** None  
 **Agent:** pico
 
@@ -157,10 +157,15 @@ The first implementation beads already exist from the previous session. Some adj
 **Files Created/Deleted/Modified:**
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/src/interfaces/boxing_input.gd`
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/src/input_manager.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/.testbed/tests/test_boxing_input_contract.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/.testbed/scenes/test_scene.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/.testbed/tests/*.uid`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/.testbed/tests/unit/*.uid`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/src/interfaces/body_cell_input.gd.uid`
 
-**Status:** ⏳ In Progress
+**Status:** ✅ Complete
 
-**Results:** Spawned `primary` SubAgent in the `coder` role after parent verification that `afc-z8o` is closed and `aerobeat-input-core-6xl` is open.
+**Results:** PASS pending QA/audit. `primary` coder implemented no-arg Boxing punch signals in commit `e03795fb40e181245ea447ef84e5087d692e9828`, then a coder cleanup follow-up committed generated Godot script UID files in `8aedd7b` so headless import no longer emits missing-UID warnings. Signals/proxies now use exact no-arg active events for `straight_left`, `straight_right`, `uppercut_left`, `uppercut_right`, `hook_left`, and `hook_right`; punch `power` forwarding was removed. GodotEnv sync was run with `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo /home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core`. Validation reported by coder and repeated by Pico: `godot --headless --path .testbed --import` passed cleanly, GUT passed 5/5 tests with 16 assertions, and `godot --headless --path .testbed res://scenes/test_scene.tscn --quit-after 1` loaded cleanly. Bead remains `in_progress` for QA/audit.
 
 ---
 
@@ -172,9 +177,9 @@ The first implementation beads already exist from the previous session. Some adj
 **References:** `REF-01`, `REF-02`, `REF-07`, `REF-08`  
 **Prompt:** With bead `aerobeat-input-core-6xl` still active, independently verify the Boxing punch signals and proxies are exact no-arg active events and no v1 punch scalar/active boolean leaked into contracts, tests, or docs. Run the highest-fidelity repo validation available and repeat the Godot fresh-open/log pass if relevant. Report pass/fail; do not close the bead.
 
-**Status:** ⏳ Pending
+**Status:** ⏳ In Progress
 
-**Results:** Pending.
+**Results:** Spawned `primary` SubAgent in the `qa` role after parent verification of input-core commits `e03795f` and `8aedd7b`.
 
 ---
 
