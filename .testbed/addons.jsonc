@@ -6,8 +6,18 @@
       "source": "symlink",
       "subfolder": "/"
     },
-    "aerobeat-feature-core": {
-      "url": "../../aerobeat-feature-core",
+    "aerobeat-mode-core": {
+      "url": "../../aerobeat-mode-core",
+      "source": "symlink",
+      "subfolder": "/"
+    },
+    "aerobeat-input-core": {
+      "url": "../../aerobeat-input-core",
+      "source": "symlink",
+      "subfolder": "/"
+    },
+    "aerobeat-tool-audio-player": {
+      "url": "../../aerobeat-tool-audio-player",
       "source": "symlink",
       "subfolder": "/"
     },

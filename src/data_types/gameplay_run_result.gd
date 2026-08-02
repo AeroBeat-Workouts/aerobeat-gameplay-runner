@@ -8,6 +8,9 @@ var accuracy := 0.0
 var duration_sec := 0.0
 var reason := ""
 var events: Array = []
+var mode_fragments: Array = []
+var judgements: Array = []
+var score_deltas: Array = []
 var metadata: Dictionary = {}
 
 func _init(values: Dictionary = {}) -> void:
@@ -18,6 +21,9 @@ func _init(values: Dictionary = {}) -> void:
 	duration_sec = float(values.get("duration_sec", duration_sec))
 	reason = String(values.get("reason", reason))
 	events = _array_or_empty(values.get("events", events))
+	mode_fragments = _array_or_empty(values.get("mode_fragments", mode_fragments))
+	judgements = _array_or_empty(values.get("judgements", judgements))
+	score_deltas = _array_or_empty(values.get("score_deltas", score_deltas))
 	metadata = _dictionary_or_empty(values.get("metadata", metadata))
 
 func to_dict() -> Dictionary:
@@ -29,6 +35,9 @@ func to_dict() -> Dictionary:
 		"duration_sec": duration_sec,
 		"reason": reason,
 		"events": events.duplicate(true),
+		"mode_fragments": mode_fragments.duplicate(true),
+		"judgements": judgements.duplicate(true),
+		"score_deltas": score_deltas.duplicate(true),
 		"metadata": metadata.duplicate(true)
 	}
 

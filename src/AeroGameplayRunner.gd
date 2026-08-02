@@ -2,7 +2,7 @@ extends Node
 ## Repo-owned gameplay runner facade.
 ##
 ## This singleton creates runner sessions and contract data objects. Concrete
-## feature modes provide the mode runner, timeline clock, and input stream
+## modes provide the mode runner, timeline clock, and input stream
 ## implementations consumed by GameplaySession.
 
 const GameplayRunConfig := preload("res://addons/aerobeat-gameplay-runner/src/data_types/gameplay_run_config.gd")
