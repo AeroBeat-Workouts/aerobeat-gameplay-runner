@@ -239,9 +239,9 @@ The first implementation beads already exist from the previous session. Some adj
 **References:** `REF-01`, `REF-02`, `REF-04`, `REF-05`, `REF-12`  
 **Prompt:** With bead `aerobeat-gameplay-runner-snf` still active, independently verify runner contract adoption, sampled clock behavior, fake input envelope fidelity, lifecycle/dispatch/terminal state/aggregation tests, and no mode-core ownership leakage. Run the highest-fidelity repo validation available and repeat fresh Godot scene-open/log inspection for the `.testbed` or runtime seam if touched. Report pass/fail; do not close the bead.
 
-**Status:** ⏳ In Progress
+**Status:** ✅ Complete
 
-**Results:** Spawned `primary` SubAgent in the `qa` role after parent verification that Task 8 implementation commit `bd0bf616b475b27ea012b3dded168b5b607ec2af` is pushed, runner git is clean, and bead `aerobeat-gameplay-runner-snf` remains open for QA/audit.
+**Results:** PASS. `primary` QA independently reviewed the active plan refs `REF-01`/`REF-02`/`REF-04`/`REF-05`/`REF-12`, bead state, implementation commit `bd0bf616b475b27ea012b3dded168b5b607ec2af`, and current runner files/tests. QA verified runner adoption of `ModeRunConfig`, `ModeTickFrame`, `ModeRunFragment`, `ModeJudgementEvent`, and `ModeScoreDelta`; runner-owned session/result envelopes; sampled production clock usage limited to `reset()`, `get_position_sec()`, `get_duration_sec()`, `get_state()`, and `is_complete()`; fake input envelopes matching input-core v1 including no-arg Boxing punch events; and lifecycle, dispatch order, terminal completion, aggregation, and fake-envelope fidelity coverage. QA reran GodotEnv sync, headless import, GUT, and `.testbed` scene load/log validation. GodotEnv sync passed; import passed with only accepted vendored GUT GUI invalid-UID warnings and the accepted headless ObjectDB leak warning; GUT passed 4/4 tests with 50 assertions; `.testbed` scene load passed cleanly. QA evidence was added to bead notes, `bd dolt push` completed, and bead `aerobeat-gameplay-runner-snf` remains `in_progress` for audit.
 
 ---
 
@@ -253,9 +253,9 @@ The first implementation beads already exist from the previous session. Some adj
 **References:** `REF-01`, `REF-02`, `REF-04`, `REF-05`, `REF-12`  
 **Prompt:** Independently audit bead `aerobeat-gameplay-runner-snf` against the plan, freeze references, diff, and validation output. If complete, close `aerobeat-gameplay-runner-snf` with `bd close aerobeat-gameplay-runner-snf --reason "Implemented, QA verified, and audited against frozen runner contract and clock scope" --json`. If not complete, leave it open and report the exact gap.
 
-**Status:** ⏳ Pending
+**Status:** ✅ Complete
 
-**Results:** Pending.
+**Results:** PASS. `primary` auditor independently audited bead `aerobeat-gameplay-runner-snf` against Tasks 8-10, frozen references, bead notes, implementation commit `bd0bf616b475b27ea012b3dded168b5b607ec2af`, QA evidence, and the current repo state. Auditor verified runner contract adoption, sampled clock scope, runner-owned fake input envelope fidelity, lifecycle/dispatch/terminal/aggregation coverage, and mode-core ownership boundaries. Auditor reran GodotEnv sync, headless import, GUT, and `.testbed` scene load/log validation. GodotEnv sync passed; import passed with only documented vendored GUT invalid-UID warnings plus the accepted headless ObjectDB leak warning; GUT passed 4/4 tests with 50 assertions; `.testbed` scene load passed cleanly. `aerobeat-gameplay-runner-snf` was closed with reason `Implemented, QA verified, and audited against frozen runner contract and clock scope`, and `bd dolt push` completed. Parent verification confirmed the bead is closed.
 
 ---
 
@@ -273,9 +273,9 @@ The first implementation beads already exist from the previous session. Some adj
 **Files Created/Deleted/Modified:**
 - Pending
 
-**Status:** ⏳ Pending
+**Status:** ⏳ In Progress
 
-**Results:** Pending.
+**Results:** Prerequisite beads `afc-z8o` and `aerobeat-input-core-6xl` are closed, Boxing git is clean on `main`, and `aerobeat-mode-boxing-hz4` is open for coder implementation.
 
 ---
 
