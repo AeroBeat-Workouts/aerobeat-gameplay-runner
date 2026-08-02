@@ -6,6 +6,7 @@ const AudioClock := preload("res://scripts/audio_loader_clock.gd")
 const InputStream := preload("res://scripts/input_manager_stream.gd")
 const ContentLoader := preload("res://scripts/playable_content_loader.gd")
 const EnvironmentAdapter := preload("res://scripts/environment_loader_adapter.gd")
+const TargetRegions := preload("res://scripts/playable_target_regions.gd")
 const GameplayRunConfig := preload("res://addons/aerobeat-gameplay-runner/src/data_types/gameplay_run_config.gd")
 const GameplayRunState := preload("res://addons/aerobeat-gameplay-runner/src/data_types/gameplay_run_state.gd")
 const GameplaySession := preload("res://addons/aerobeat-gameplay-runner/src/runtime/gameplay_session.gd")
@@ -20,6 +21,7 @@ const ModeJudgementEvent := preload("res://addons/aerobeat-mode-core/src/data_ty
 
 var _config := {}
 var _mapper: PlayfieldMapper
+var _target_regions: RefCounted
 var _session: RefCounted = null
 var _clock: RefCounted = null
 var _input_stream: RefCounted = null
@@ -49,6 +51,7 @@ var _overlay_visible_until_ms := 0
 func _ready() -> void:
 	_config = ConfigLoader.new().load_config()
 	_mapper = PlayfieldMapperScript.new(_config)
+	_target_regions = TargetRegions.new(_mapper.columns, _mapper.rows)
 	_camera.transform = _mapper.get_camera_start_transform()
 	_audio_loader = AeroAudioLoaderScript.new()
 	_audio_loader.name = "AeroAudioLoader"
@@ -122,7 +125,7 @@ func _load_song(path: String) -> void:
 	if not bool(_loaded_content.get("ok", false)):
 		_update_hud("Song load failed: %s" % _loaded_content.get("error", "unknown"))
 		return
-	_targets = Array(_loaded_content.get("events", [])).duplicate(true)
+	_targets = _as_array(_loaded_content.get("events", [])).duplicate(true)
 	_build_target_nodes()
 	var audio_path := String(_loaded_content.get("audio_path", ""))
 	if not audio_path.is_empty():
@@ -205,10 +208,13 @@ func _build_target_nodes() -> void:
 	_target_nodes.clear()
 	for target in _targets:
 		var id := String(target.get("id", "target_%d" % _target_nodes.size()))
-		var node := _make_target_mesh(target)
-		node.name = id
-		_targets_root.add_child(node)
-		_target_nodes[id] = node
+		var nodes: Array[Node3D] = []
+		for index in range(_target_cells(target).size()):
+			var node := _make_target_mesh(target)
+			node.name = "%s_cell_%d" % [id, index]
+			_targets_root.add_child(node)
+			nodes.append(node)
+		_target_nodes[id] = nodes
 
 func _make_target_mesh(target: Dictionary) -> MeshInstance3D:
 	var mesh := SphereMesh.new()
@@ -228,39 +234,20 @@ func _make_target_mesh(target: Dictionary) -> MeshInstance3D:
 func _update_targets(audio_position_sec: float) -> void:
 	for target in _targets:
 		var id := String(target.get("id", ""))
-		var node: Node3D = _target_nodes.get(id, null)
-		if node == null:
+		var nodes: Array = _target_nodes.get(id, []) if _target_nodes.get(id, []) is Array else []
+		if nodes.is_empty():
 			continue
 		var beat_time := float(target.get("position_sec", 0.0))
-		node.visible = _mapper.target_visible(beat_time, audio_position_sec)
-		if not node.visible:
-			continue
-		var cell := _target_cell(target)
-		var world := _mapper.cell_center_to_world(cell, _mapper.target_z_at_time(beat_time, audio_position_sec))
-		node.position = world
+		var target_visible := _mapper.target_visible(beat_time, audio_position_sec)
+		var cells := _target_cells(target)
+		for index in range(nodes.size()):
+			var node: Node3D = nodes[index]
+			node.visible = target_visible
+			if target_visible and index < cells.size():
+				node.position = _mapper.cell_center_to_world(cells[index], _mapper.target_z_at_time(beat_time, audio_position_sec))
 
-func _target_cell(target: Dictionary) -> int:
-	if mode_id == "flow":
-		if target.has("placement"):
-			return int(target.get("placement", 0))
-		if target.has("startPlacement"):
-			return int(target.get("startPlacement", 0))
-		var cells := Array(target.get("cells", []))
-		return int(cells[0]) if not cells.is_empty() else 0
-	var event_name := String(target.get("event", target.get("type", "")))
-	match event_name:
-		"straight_left", "uppercut_left", "hook_left":
-			return 5
-		"straight_right", "uppercut_right", "hook_right":
-			return 6
-		"weave_left_enabled", "weave_left_disabled":
-			return 4
-		"weave_right_enabled", "weave_right_disabled":
-			return 7
-		"squat_enabled", "squat_disabled":
-			return 9
-		_:
-			return 5
+func _target_cells(target: Dictionary) -> Array[int]:
+	return _target_regions.flow_cells_for_target(target) if mode_id == "flow" else _target_regions.boxing_cells_for_target(target)
 
 func _apply_judgements(emitted: Array) -> void:
 	for item in emitted:
@@ -276,16 +263,16 @@ func _update_player_rig_from_nose() -> void:
 		_player_rig.position = _mapper.anchor_to_rig_position(nose)
 
 func _update_debug_markers() -> void:
-	var always := bool(_config.get("debug", {}).get("show_body_pose_overlay", true))
-	var visible := always or Time.get_ticks_msec() <= _overlay_visible_until_ms
+	var debug_config := _as_dict(_config.get("debug", {}))
+	var visible: bool = _target_regions.debug_pose_overlay_visible(debug_config, Time.get_ticks_msec(), _overlay_visible_until_ms)
 	_markers_root.visible = visible
 	if not visible or _input_manager == null:
 		return
-	_set_marker("Nose", _input_manager.get_body_grid_nose(), Color.YELLOW)
-	_set_marker("LeftWrist", _input_manager.get_body_grid_left_wrist(), Color.BLACK)
-	_set_marker("RightWrist", _input_manager.get_body_grid_right_wrist(), Color.WHITE)
+	_set_marker("Nose", _input_manager.get_body_grid_nose(), Color.YELLOW, _target_regions.debug_marker_enabled(debug_config, "nose"))
+	_set_marker("LeftWrist", _input_manager.get_body_grid_left_wrist(), Color.BLACK, _target_regions.debug_marker_enabled(debug_config, "left_wrist"))
+	_set_marker("RightWrist", _input_manager.get_body_grid_right_wrist(), Color.WHITE, _target_regions.debug_marker_enabled(debug_config, "right_wrist"))
 
-func _set_marker(name_text: String, anchor: Dictionary, color: Color) -> void:
+func _set_marker(name_text: String, anchor: Dictionary, color: Color, enabled: bool = true) -> void:
 	var marker: MeshInstance3D = _markers_root.get_node_or_null(name_text)
 	if marker == null:
 		marker = MeshInstance3D.new()
@@ -298,13 +285,16 @@ func _set_marker(name_text: String, anchor: Dictionary, color: Color) -> void:
 		mat.albedo_color = color
 		marker.material_override = mat
 		_markers_root.add_child(marker)
-	marker.visible = bool(anchor.get("valid", false))
+	marker.visible = enabled and bool(anchor.get("valid", false))
 	if marker.visible:
 		marker.position = _mapper.anchor_to_rig_position(anchor) + Vector3(0.0, 0.0, _mapper.hit_plane_z_m)
 
 func _build_grid() -> void:
 	for child in _grid_root.get_children():
 		child.queue_free()
+	_grid_root.visible = _target_regions.debug_grid_visible(_as_dict(_config.get("debug", {})))
+	if not _grid_root.visible:
+		return
 	for cell in range(_mapper.columns * _mapper.rows):
 		var cube := MeshInstance3D.new()
 		cube.name = "Cell%d" % cell
@@ -320,7 +310,7 @@ func _build_grid() -> void:
 		_grid_root.add_child(cube)
 
 func _load_hit_sfx() -> void:
-	var audio_cfg := Dictionary(_config.get("audio", {}))
+	var audio_cfg := _as_dict(_config.get("audio", {}))
 	var sfx_path := String(audio_cfg.get("hit_sfx_path", "res://assets/hit_sfx.wav"))
 	_audio_loader.load({"kind": "file", "path": sfx_path}, String(audio_cfg.get("hit_sfx_slot", "hit_sfx")))
 
@@ -332,3 +322,9 @@ func _update_hud(message: String) -> void:
 		float(_clock.get_position_sec()) if _clock != null else 0.0,
 		summary.get("scale_mode", ""),
 	]
+
+func _as_dict(value: Variant) -> Dictionary:
+	return value if value is Dictionary else {}
+
+func _as_array(value: Variant) -> Array:
+	return value if value is Array else []
