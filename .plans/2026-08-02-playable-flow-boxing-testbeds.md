@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-02  
 **Status:** In Progress  
-**Last Updated:** 2026-08-02 19:47 EDT
+**Last Updated:** 2026-08-02 19:56 EDT
 **Blocked Reason:** None  
 **Agent:** pico
 
@@ -338,7 +338,7 @@ Before QA and audit can pass, the coder/QA evidence must include:
 
 **Status:** ⏳ In Progress
 
-**Results:** Execution beads created. Cross-repo dependencies could not be represented with local `bd dep add`, so dependency order is recorded in bead notes and enforced by orchestration. The input-core contract seam passed QA/audit and closed `aerobeat-input-core-ij5`; the camera-tracking body-grid anchor seam passed implementation/QA/audit and closed `oc-zex8`. Runner implementation landed in commit `c1bb79a` with playable Flow and Boxing `.testbed` scenes, runner-owned `assets/playable_testbed.yaml`, `PlayfieldMapper`, shared playable harness/adapters, FileDialog song/environment selection, dummy hit SFX, generated mesh/debug visuals, and GodotEnv dependencies wired into the testbed. Coder validation passed targeted GUT (`11` tests, `174` assertions), fresh headless Flow and Boxing scene opens, GodotEnv sync, and class-name collision scan. QA returned `BLOCKED`: debug overlay YAML toggles are not individually honored, Flow burst/arc multi-placement visualization only renders one cell, and Boxing transition/blocked-region visualization maps spans/bands to single cells. Accepted manual gaps remain for later QA after static blockers are fixed: live camera/T-pose behavior, GUI FileDialog song/environment selection, supported environment display proof, hit gesture/SFX proof, recalibration pause/resume, and completion summary behavior.
+**Results:** Execution beads created. Cross-repo dependencies could not be represented with local `bd dep add`, so dependency order is recorded in bead notes and enforced by orchestration. The input-core contract seam passed QA/audit and closed `aerobeat-input-core-ij5`; the camera-tracking body-grid anchor seam passed implementation/QA/audit and closed `oc-zex8`. Runner implementation landed in commit `c1bb79a` with playable Flow and Boxing `.testbed` scenes, runner-owned `assets/playable_testbed.yaml`, `PlayfieldMapper`, shared playable harness/adapters, FileDialog song/environment selection, dummy hit SFX, generated mesh/debug visuals, and GodotEnv dependencies wired into the testbed. Coder validation passed targeted GUT (`11` tests, `174` assertions), fresh headless Flow and Boxing scene opens, GodotEnv sync, and class-name collision scan. QA returned `BLOCKED`: debug overlay YAML toggles were not individually honored, Flow burst/arc multi-placement visualization only rendered one cell, and Boxing transition/blocked-region visualization mapped spans/bands to single cells. Coder follow-up commit `e362153` fixed those static QA blockers by adding `playable_target_regions.gd`, rendering one visual per required authored/semantic cell or region, honoring the independent debug overlay toggles, and adding focused GUT coverage. Coder validation after the fix passed GodotEnv sync, headless import, GUT (`16` tests, `190` assertions), fresh headless Flow and Boxing scene opens, class-name scan, and `git diff --check`. QA retry is now the next clear unblocked step on bead `aerobeat-gameplay-runner-an1`; manual/high-fidelity gaps remain for QA to classify: live camera/T-pose behavior, GUI FileDialog song/environment selection, supported environment display proof, hit gesture/SFX proof, recalibration pause/resume, and completion summary behavior.
 
 ---
 
@@ -346,12 +346,15 @@ Before QA and audit can pass, the coder/QA evidence must include:
 
 **Status:** ⚠️ Partial
 
-**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is committed and pushed, but QA found static blocker fixes required before the playable seam can advance to audit.
+**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is committed and pushed, and coder follow-up fixes for the static QA blockers are committed and pushed. QA retry is pending before the playable seam can advance to audit.
 
 **Reference Check:** Subagent reviews completed against referenced repos. The final readiness audit passed after freeze edits and closed `aerobeat-gameplay-runner-7l8`.
 
 **Commits:**
-- Runner QA retry pending on `aerobeat-gameplay-runner-an1` after static blocker fixes.
+- `c1bb79a` - Add playable Flow and Boxing testbeds
+- `7d847a8` - Record playable testbed implementation handoff
+- `076ca8e` - Record playable testbed QA blockers
+- `e362153` - Fix playable testbed QA blockers
 
 **Lessons Learned:** Pending.
 
