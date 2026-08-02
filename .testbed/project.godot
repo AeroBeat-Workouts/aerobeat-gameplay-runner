@@ -10,6 +10,7 @@ config/features=PackedStringArray("4.6", "Forward Plus")
 
 AeroHeadlessManager="*res://addons/aerobeat-tool-headless-manager/src/AeroHeadlessManager.gd"
 AeroGameplayRunner="*res://addons/aerobeat-gameplay-runner/src/AeroGameplayRunner.gd"
+AeroCameraTracking="*res://addons/aerobeat-input-camera-tracking/src/AeroCameraTracking.gd"
 
 [debug]
 

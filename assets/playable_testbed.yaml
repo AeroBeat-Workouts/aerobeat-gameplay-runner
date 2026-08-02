@@ -1,0 +1,68 @@
+# Select the playable testbed config schema this asset should validate against.
+schema: aerobeat/playable_testbed_config
+# Increment when the config shape changes in a breaking way.
+version: 1
+# Route this asset to the runner playable testbed profile. Allowed options: [developer].
+profile: developer
+grid:
+  # Number of calibrated body-grid columns. runner testbed runtime only.
+  columns: 4
+  # Number of calibrated body-grid rows. runner testbed runtime only.
+  rows: 3
+  # Cell origin used by input-core and first-person target placement. Allowed options: [top_left].
+  origin: top_left
+  # Cell indexing order. Allowed options: [row_major].
+  indexing: row_major
+scale:
+  # Scaling rule for converting calibrated athlete-space to meters. Allowed options: [athlete_height_or_fallback].
+  mode: athlete_height_or_fallback
+  # Optional known athlete height in meters; null uses fallback cell dimensions. runner testbed runtime only.
+  athlete_height_m: null
+  # Portion of athlete height used as playfield height when athlete_height_m is known.
+  playfield_height_ratio: 0.95
+  # Width-to-height ratio for each grid cell when scaling from athlete height.
+  cell_aspect_ratio: 1.2
+  # Fallback cell width in meters when athlete height is unknown. runner testbed runtime only.
+  fallback_cell_width_m: 0.60
+  # Fallback cell height in meters when athlete height is unknown. runner testbed runtime only.
+  fallback_cell_height_m: 0.50
+camera:
+  # Camera local position on the PlayerRig in meters. runner testbed runtime only.
+  start_position_m: [0.0, 0.0, 0.0]
+  # Camera local rotation in degrees. runner testbed runtime only.
+  rotation_deg: [0.0, 0.0, 0.0]
+  # Clamp PlayerRig X to the calibrated grid before world conversion. runner testbed runtime only.
+  clamp_horizontal: true
+  # Clamp PlayerRig Y to the calibrated grid before world conversion. runner testbed runtime only.
+  clamp_vertical: true
+target:
+  # Z depth of the timing/hit plane in meters, with Godot forward along -Z.
+  hit_plane_z_m: -1.0
+  # Spawn distance behind the hit plane in meters; Beat Saber-inspired approximation for this developer testbed.
+  spawn_distance_m: 12.0
+  # Interpret spawn_distance_m relative to the hit plane. Allowed options: [hit_plane].
+  spawn_distance_is_relative_to: hit_plane
+  # Seconds before beat time that targets become visible; hit windows still come from mode runners and audio clock.
+  approach_time_sec: 1.5
+  # Approximate spherical hit feedback radius in meters for generated dummy visuals.
+  hit_box_radius_m: 0.35
+audio:
+  # Main music audio slot consumed through AeroAudioLoader. runner testbed runtime only.
+  music_slot: default
+  # Hit sound audio slot consumed through AeroAudioLoader. runner testbed runtime only.
+  hit_sfx_slot: hit_sfx
+  # Dummy hit SFX file path for successful hit feedback. runner testbed runtime only.
+  hit_sfx_path: res://assets/hit_sfx.wav
+debug:
+  # Draw body-grid pose overlay after calibration. runner testbed debug only.
+  show_body_pose_overlay: true
+  # Draw the calibrated body-grid lane affordance. runner testbed debug only.
+  show_body_grid_overlay: true
+  # Draw the continuous normalized nose marker. runner testbed debug only.
+  show_nose_marker: true
+  # Draw the continuous normalized left-wrist marker. runner testbed debug only.
+  show_left_wrist_marker: true
+  # Draw the continuous normalized right-wrist marker. runner testbed debug only.
+  show_right_wrist_marker: true
+  # Milliseconds to keep body-grid pose visible after calibration; zero disables post-calibration persistence.
+  body_grid_pose_visible_after_calibration_ms: 2000

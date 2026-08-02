@@ -16,6 +16,16 @@
       "source": "symlink",
       "subfolder": "/"
     },
+    "aerobeat-input-camera-tracking": {
+      "url": "../../aerobeat-input-camera-tracking",
+      "source": "symlink",
+      "subfolder": "/"
+    },
+    "aerobeat-tool-camera-tracking": {
+      "url": "../../aerobeat-tool-camera-tracking",
+      "source": "symlink",
+      "subfolder": "/"
+    },
     "aerobeat-content-core": {
       "url": "../../aerobeat-content-core",
       "source": "symlink",
@@ -33,6 +43,66 @@
     },
     "aerobeat-tool-audio-player": {
       "url": "../../aerobeat-tool-audio-player",
+      "source": "symlink",
+      "subfolder": "/"
+    },
+    "aerobeat-vendor-godot-audio": {
+      "url": "../../aerobeat-vendor-godot-audio",
+      "source": "symlink",
+      "subfolder": "/"
+    },
+    "aerobeat-environment-core": {
+      "url": "../../aerobeat-environment-core",
+      "source": "symlink",
+      "subfolder": "/"
+    },
+    "aerobeat-environment-loader": {
+      "url": "../../aerobeat-environment-loader",
+      "source": "symlink",
+      "subfolder": "/"
+    },
+    "aerobeat-tool-image-loader": {
+      "url": "../../aerobeat-tool-image-loader",
+      "source": "symlink",
+      "subfolder": "/"
+    },
+    "aerobeat-vendor-godot-image": {
+      "url": "../../aerobeat-vendor-godot-image",
+      "source": "symlink",
+      "subfolder": "/"
+    },
+    "aerobeat-tool-video-player": {
+      "url": "../../aerobeat-tool-video-player",
+      "source": "symlink",
+      "subfolder": "/"
+    },
+    "aerobeat-tool-core": {
+      "url": "../../aerobeat-tool-core",
+      "source": "symlink",
+      "subfolder": "/"
+    },
+    "aerobeat-vendor-godot-video": {
+      "url": "../../aerobeat-vendor-godot-video",
+      "source": "symlink",
+      "subfolder": "/"
+    },
+    "aerobeat-tool-gltf-loader": {
+      "url": "../../aerobeat-tool-gltf-loader",
+      "source": "symlink",
+      "subfolder": "/"
+    },
+    "aerobeat-vendor-godot-gltf": {
+      "url": "../../aerobeat-vendor-godot-gltf",
+      "source": "symlink",
+      "subfolder": "/"
+    },
+    "aerobeat-tool-gaussian-splat-loader": {
+      "url": "../../aerobeat-tool-gaussian-splat-loader",
+      "source": "symlink",
+      "subfolder": "/"
+    },
+    "aerobeat-vendor-gdgs": {
+      "url": "../../aerobeat-vendor-gdgs/src",
       "source": "symlink",
       "subfolder": "/"
     },

@@ -1,0 +1,77 @@
+[gd_scene load_steps=2 format=3 uid="uid://boxingplayabletestbed"]
+
+[ext_resource type="Script" path="res://scripts/boxing_playable_testbed.gd" id="1"]
+
+[node name="BoxingPlayableTestbed" type="Node3D"]
+script = ExtResource("1")
+
+[node name="EnvironmentWorld" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="Targets" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="Grid" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="Markers" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="PlayerRig" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="Camera3D" type="Camera3D" parent="PlayerRig"]
+unique_name_in_owner = true
+current = true
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+rotation = Vector3(-0.8, -0.25, 0.0)
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Panel" type="PanelContainer" parent="UI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="UI/Panel"]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 1268.0
+offset_bottom = 708.0
+
+[node name="Toolbar" type="HBoxContainer" parent="UI/Panel/VBox"]
+
+[node name="PickSongButton" type="Button" parent="UI/Panel/VBox/Toolbar"]
+unique_name_in_owner = true
+text = "Song"
+
+[node name="PickEnvironmentButton" type="Button" parent="UI/Panel/VBox/Toolbar"]
+unique_name_in_owner = true
+text = "Environment"
+
+[node name="CalibrateButton" type="Button" parent="UI/Panel/VBox/Toolbar"]
+unique_name_in_owner = true
+text = "T-Pose"
+
+[node name="HudLabel" type="Label" parent="UI/Panel/VBox"]
+unique_name_in_owner = true
+text = "Boxing playable testbed"
+
+[node name="SummaryLabel" type="Label" parent="UI/Panel/VBox"]
+unique_name_in_owner = true
+
+[node name="EnvironmentCanvas" type="Control" parent="UI/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 180)
+
+[node name="SongDialog" type="FileDialog" parent="UI"]
+unique_name_in_owner = true
+
+[node name="EnvironmentDialog" type="FileDialog" parent="UI"]
+unique_name_in_owner = true
