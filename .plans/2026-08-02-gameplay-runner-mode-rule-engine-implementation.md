@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-02  
 **Status:** In Progress  
-**Last Updated:** 2026-08-02 10:14 EDT  
+**Last Updated:** 2026-08-02 10:41 EDT  
 **Blocked Reason:** None  
 **Agent:** pico
 
@@ -294,9 +294,9 @@ The first implementation beads already exist from the previous session. Some adj
 **References:** `REF-01`, `REF-02`, `REF-09`  
 **Prompt:** With bead `aerobeat-mode-boxing-hz4` still active, independently verify the Boxing engine is pure, consumes the frozen no-arg input events, emits mode-core fragments, covers hit/miss/early/late/combo/completion fixture behavior, and has no runner/camera/UI/assembly dependency. Run the highest-fidelity repo validation available and repeat any relevant Godot fresh-open/log pass. Report pass/fail; do not close the bead.
 
-**Status:** ⏳ In Progress
+**Status:** ✅ Complete
 
-**Results:** Pending QA completion.
+**Results:** PASS. `primary` QA independently verified the Boxing pure rule engine against active plan Tasks 11-12, frozen refs `REF-01`/`REF-02`/`REF-09`, bead notes, implementation commit `78e8c5e2ea12cc8b5470d35ed3391195b4c93451`, current source/tests, README, and `.testbed/addons.jsonc`. QA confirmed `src/boxing_mode_runner.gd` extends only mode-core `ModeRunner`, preloads mode-core DTOs/fragments only, emits `ModeJudgementEvent`, `ModeScoreDelta`, and `ModeRunFragment`, and has no gameplay runner, session/clock/fake stream, camera provider, raw landmark, detector payload, UI shell, or assembly dependency. QA verified the frozen no-arg Boxing punch surface (`straight_left`, `straight_right`, `uppercut_left`, `uppercut_right`, `hook_left`, `hook_right`) and found no punch `power`, `strength`, scalar `intensity`, `confidence`, `velocity`, detector score, or explicit active boolean payload semantics reintroduced. Fixture coverage includes descriptor/no-arg contract, hit, miss, early, late, combo reset/recovery, guard/squat/weave defensive transitions, completion fragments, and punch-arg rejection. QA reran GodotEnv sync, headless import, GUT, and bounded headless editor fresh-open/log validation. GodotEnv sync passed; import passed with only accepted vendored GUT invalid-UID warnings and accepted headless ObjectDB leak warning; GUT passed 7/7 tests with 35 assertions; fresh-open passed with only accepted vendored GUT invalid-UID warnings, scan-thread-aborted-on-quit warning, and accepted ObjectDB leak warning. QA evidence was added to bead notes, `bd dolt push` completed, and bead `aerobeat-mode-boxing-hz4` remains `in_progress` for audit.
 
 ---
 
