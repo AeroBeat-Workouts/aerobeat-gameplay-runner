@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-01  
 **Status:** Draft  
-**Last Updated:** 2026-08-01 22:08 EDT  
+**Last Updated:** 2026-08-01 22:10 EDT
 **Blocked Reason:** High-level phase order and runner/mode-core envelope split approved; contract ownership freeze proposal in progress before implementation.  
 **Agent:** pico
 
@@ -130,6 +130,62 @@ Only after runner `.testbed` passes:
 
 ---
 
+## Contract Ownership Freeze Proposal
+
+### Boundary Rule
+
+Freeze the v1 seam as a wrapper relationship:
+
+- `aerobeat-mode-core` owns portable mode contracts and the fragments a mode rule engine produces while interpreting authored content and normalized input.
+- `aerobeat-gameplay-runner` owns the complete run/session envelope, timeline/clock orchestration state, aggregation, dispatch history, fake stream/testbed transport, and assembly-facing session facade.
+- Modes may depend on `aerobeat-mode-core`, `aerobeat-content-core`, and `aerobeat-input-core`; modes should not depend on `aerobeat-gameplay-runner`.
+- Runner may depend on `aerobeat-mode-core` fragment DTOs/interfaces and wrap mode-produced fragments into complete run/session results.
+
+### Proposed V1 DTOs And Interfaces
+
+| Proposed contract | Owner repo | Responsibility | Reason |
+| --- | --- | --- | --- |
+| `ModeDescriptor` | `aerobeat-mode-core` | Portable mode identity: `mode_id`, display name/key, supported chart/input contract IDs, and mode contract version. | Boxing and Flow both need a shared way to advertise what they implement without importing runner session envelopes. |
+| `ModeRunConfig` | `aerobeat-mode-core` | Mode-local immutable setup subset: `mode_id`, chart/content handle or chart object reference, seed, mode tuning/scoring options. | This is the portion a mode rule engine needs to start; it should be reusable in mode-local tests and runner composition. Runner can derive it from its session config. |
+| `ModeRunner` | `aerobeat-mode-core` | Pure rule-engine lifecycle interface: `start(config)`, `tick(frame)`, `is_complete()`, and `stop(reason)`, returning mode fragments/events only. | The current runner file `src/interfaces/gameplay_mode_runner.gd` documents a mode-facing interface. That contract should be portable so Boxing/Flow can implement and test it without depending on runner. |
+| `ModeTickFrame` | `aerobeat-mode-core` | Per-tick input to a mode: timeline position, delta, chart events due for evaluation, and normalized input events/frame. | Keeps the mode engine contract explicit and portable while avoiding runner-owned session state. |
+| `ModeEvent` | `aerobeat-mode-core` | Shared base event shape emitted by modes: event type, mode ID, target/chart object reference, timestamp/position, metadata. | Runner dispatch should normalize and store events, but the mode-emitted vocabulary must be shared across Boxing and Flow. |
+| `ModeJudgementEvent` | `aerobeat-mode-core` | Judgement fragment for hit/miss/late/early/perfect-style outcomes, including timing offset and authored target reference. | Judgement semantics are produced by mode rule engines and should be testable in mode repos. |
+| `ModeScoreDelta` | `aerobeat-mode-core` | Mode-produced scoring fragment: score delta, combo effect, accuracy contribution, and optional mode metadata. | Runner aggregates score, but the unit of scoring emitted by a mode is mode-core contract truth. |
+| `ModeRunFragment` | `aerobeat-mode-core` | Start/stop/completion fragment produced by a mode: mode state/result reason, emitted summaries, mode-local metadata. | Lets runner wrap mode completion details without making the mode know about full sessions. |
+| `ModeFixtureCase` | `aerobeat-mode-core` | Minimal shared fixture case shape for mode rule-engine contract tests: config, chart snippet reference, input/tick frames, expected events/fragments. | Boxing and Flow need comparable focused tests before runner composition; runner can have its own transport fixtures separately. |
+| `GameplayRunConfig` | `aerobeat-gameplay-runner` | Complete session setup envelope: selected song/package/chart IDs, selected mode, timeline binding config, scoring aggregation settings, transport/testbed metadata, and derived `ModeRunConfig`. | This contains session orchestration concerns beyond what a pure mode should receive. Existing `src/data_types/gameplay_run_config.gd` should stay runner-owned, but pass only a mode subset into mode engines. |
+| `GameplayRunState` | `aerobeat-gameplay-runner` | Session lifecycle state names: idle, ready, running, paused, completed, stopped, failed. | Pause/resume/retry and terminal state are runner session behavior, not portable mode-rule vocabulary. Existing `src/data_types/gameplay_run_state.gd` should stay. |
+| `GameplayRunResult` | `aerobeat-gameplay-runner` | Complete run result envelope: final session state, aggregated score/combo/accuracy/duration, reason, event history, mode fragments, and runner metadata. | Runner wraps mode-core fragments into a complete product/testbed result. Existing `src/data_types/gameplay_run_result.gd` should stay runner-owned and evolve to carry mode-core fragments explicitly. |
+| `GameplaySession` | `aerobeat-gameplay-runner` | Runtime session coordinator for start/tick/pause/resume/stop, active mode runner, clock, input stream, event dispatch, aggregation, and final result creation. | This is the conductor approved for runner. Existing `src/runtime/gameplay_session.gd` should stay. |
+| `GameplayTimelineClock` | `aerobeat-gameplay-runner` | Narrow clock adapter interface consumed by runner from `aerobeat-tool-audio-player`: reset/advance or sample current position/completion. | Audio clock truth is outside runner, but the runner-owned adapter seam coordinates session timeline. Existing `src/interfaces/gameplay_timeline_clock.gd` should stay runner-owned until the timing freeze defines exact methods. |
+| `GameplayInputStream` | `aerobeat-gameplay-runner` | Runner/testbed fake input stream interface that supplies normalized input frames/events at timeline positions. | Derrick approved first fake input streams as runner-owned test infrastructure; `aerobeat-input-core` remains the stable input contract source. Existing `src/interfaces/gameplay_input_stream.gd` should stay runner-owned. |
+| `GameplayEventDispatcher` | `aerobeat-gameplay-runner` | Runner dispatch/history transport that accepts mode-core `ModeEvent` fragments and stores/emits session events. | Event storage/fanout is session/testbed orchestration, not a pure mode contract. Existing `src/runtime/gameplay_event_dispatcher.gd` should stay but should stop inventing mode event fields beyond wrapper metadata. |
+| `GameplayScoreAggregator` | `aerobeat-gameplay-runner` | Aggregates mode-core `ModeScoreDelta`/judgement fragments into session score, combo, hit/miss totals, and accuracy. | Scoring fragments come from modes; the final accumulated scoreboard is runner-owned. Existing `src/runtime/gameplay_score_aggregator.gd` should stay. |
+| `GameplayTestbedTransport` | `aerobeat-gameplay-runner` | Testbed-only serialized event/result transport for runner `.testbed` scenes, fake streams, and headless validation. | Transport is a runner validation concern and should not leak into portable mode-core contracts. Add only when the runner `.testbed` needs a named seam. |
+
+### Existing Name And File Decisions
+
+- Keep `src/data_types/gameplay_run_config.gd` in `aerobeat-gameplay-runner`; tighten its comments later from "passed into a gameplay mode runner" to "session envelope that derives/passes a mode config subset."
+- Keep `src/data_types/gameplay_run_result.gd` in `aerobeat-gameplay-runner`; later add explicit slots for mode-core `ModeRunFragment`, `ModeJudgementEvent`, and/or `ModeScoreDelta` lists instead of generic untyped dictionaries.
+- Keep `src/data_types/gameplay_run_state.gd` in `aerobeat-gameplay-runner`; these are runner session states, not mode-core states.
+- Move/rename the contract documented by `src/interfaces/gameplay_mode_runner.gd` into `aerobeat-mode-core` as `ModeRunner` or `GameplayModeRunner`. Prefer `ModeRunner` because the repo rename already approved mode terminology and the contract is mode-facing. Leave a runner-local adapter only if Godot package loading needs a bridge.
+- Keep `src/interfaces/gameplay_timeline_clock.gd` in `aerobeat-gameplay-runner`; it is a runner adapter to external audio timing and should be revisited in the timing freeze.
+- Keep `src/interfaces/gameplay_input_stream.gd` in `aerobeat-gameplay-runner`; it is runner/testbed fake-stream infrastructure, not input-core contract truth.
+- Keep `src/runtime/gameplay_session.gd`, `src/runtime/gameplay_event_dispatcher.gd`, and `src/runtime/gameplay_score_aggregator.gd` in `aerobeat-gameplay-runner`; they are orchestration/aggregation/session transport.
+- Keep `src/AeroGameplayRunner.gd` in `aerobeat-gameplay-runner`; later replace "feature modes" wording with "modes" and expose factories that create runner envelopes, not mode-core contracts.
+- Create `aerobeat-mode-core/src/` only when implementing the approved freeze; it is currently absent and the README says the repo is intentionally a minimal lane-definition placeholder.
+- Do not move runner envelopes into `aerobeat-mode-core`, and do not make Boxing/Flow import runner just to implement a mode runner.
+
+### Practical Implementation Notes For Next Wave
+
+- First implementation step in `aerobeat-mode-core`: add only the portable mode DTOs/interfaces above and focused tests/fixtures if a testbed is introduced. Avoid adding session, clock, fake-stream, or transport types there.
+- First implementation step in `aerobeat-gameplay-runner`: depend on the new mode-core contracts, adapt `GameplaySession.tick()` to pass a `ModeTickFrame`, accept mode-core event/score fragments, and wrap them into `GameplayRunResult`.
+- The current runner aggregator reads generic dictionary fields such as `type`, `score`, and `score_delta`; next wave should replace that implicit event shape with mode-core judgement/score fragment fields.
+- The current runner `GameplayRunConfig` includes broad `timeline`, `scoring`, and `metadata` dictionaries. Keep that flexibility for v1 bootstrap, but document which keys are runner session envelope keys and which are transformed into `ModeRunConfig`.
+
+---
+
 ## Tasks
 
 ### Task 1: Draft And Review High-Level Plan
@@ -162,7 +218,7 @@ Only after runner `.testbed` passes:
 
 **Status:** ⏳ In Progress
 
-**Results:** Research bead created and claimed. Waiting for SubAgent contract ownership freeze proposal.
+**Results:** Research bead created and claimed. Contract ownership freeze proposal added above for Derrick review; bead intentionally remains in progress pending approval.
 
 ---
 
