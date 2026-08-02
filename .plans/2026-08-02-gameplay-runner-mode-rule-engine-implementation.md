@@ -429,11 +429,12 @@ The first implementation beads already exist from the previous session. Some adj
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed/`
 
 **Files Created/Deleted/Modified:**
-- Pending
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed/addons.jsonc`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed/tests/test_gameplay_runner_contract.gd`
 
-**Status:** ⏳ Pending
+**Status:** ✅ Implemented pending QA/audit
 
-**Results:** Pending.
+**Results:** PASS pending QA/audit. `primary` coder composed the runner `.testbed` with runner, mode-core, content-core, input-core, Boxing, and Flow through GodotEnv symlink addons. GodotEnv sync was run with `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo /home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed`. The GUT suite now verifies input-core signal contract composition, actual `BoxingModeRunner` and `FlowModeRunner` descriptors, tiny Boxing and Flow full runs with fake clocks/input streams before BeatSaver coverage, content-core validation for all 14 approved BeatSaver regression fixtures, and full runner sessions over those fixtures using the real Boxing/Flow engines. Validation reported by coder: GodotEnv sync passed; `godot --headless --path .testbed --import` passed with accepted vendored GUT invalid-UID warnings and accepted headless ObjectDB shutdown warning; GUT passed 6/6 tests with 148 assertions and no orphan/resource warnings; `timeout 12s godot --headless --path .testbed res://scenes/gameplay_runner_testbed.tscn --quit-after 1` passed cleanly. Bead `aerobeat-gameplay-runner-yij` remains `in_progress` for QA/audit.
 
 ---
 

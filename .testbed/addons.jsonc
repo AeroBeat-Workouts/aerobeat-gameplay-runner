@@ -16,6 +16,21 @@
       "source": "symlink",
       "subfolder": "/"
     },
+    "aerobeat-content-core": {
+      "url": "../../aerobeat-content-core",
+      "source": "symlink",
+      "subfolder": "/"
+    },
+    "aerobeat-mode-boxing": {
+      "url": "../../aerobeat-mode-boxing",
+      "source": "symlink",
+      "subfolder": "/"
+    },
+    "aerobeat-mode-flow": {
+      "url": "../../aerobeat-mode-flow",
+      "source": "symlink",
+      "subfolder": "/"
+    },
     "aerobeat-tool-audio-player": {
       "url": "../../aerobeat-tool-audio-player",
       "source": "symlink",
