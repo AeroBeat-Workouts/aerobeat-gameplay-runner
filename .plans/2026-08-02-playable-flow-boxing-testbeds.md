@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-02  
 **Status:** In Progress  
-**Last Updated:** 2026-08-02 18:45 EDT
+**Last Updated:** 2026-08-02 19:28 EDT
 **Blocked Reason:** None  
 **Agent:** pico
 
@@ -338,7 +338,7 @@ Before QA and audit can pass, the coder/QA evidence must include:
 
 **Status:** ⏳ In Progress
 
-**Results:** Execution beads created. Cross-repo dependencies could not be represented with local `bd dep add`, so dependency order is recorded in bead notes and enforced by orchestration: `aerobeat-input-core-ij5` first, then `aerobeat-input-camera-tracking-8fbh`, then `aerobeat-gameplay-runner-an1`.
+**Results:** Execution beads created. Cross-repo dependencies could not be represented with local `bd dep add`, so dependency order is recorded in bead notes and enforced by orchestration. The input-core contract seam passed QA/audit and closed `aerobeat-input-core-ij5`; the camera-tracking body-grid anchor seam passed implementation/QA/audit and closed `oc-zex8`. The next unblocked seam is runner implementation on `aerobeat-gameplay-runner-an1`.
 
 ---
 
@@ -346,12 +346,12 @@ Before QA and audit can pass, the coder/QA evidence must include:
 
 **Status:** ⚠️ Partial
 
-**What We Built:** Frozen implementation plan plus independent readiness audit. Implementation seams are ready to start.
+**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is now the next active seam.
 
 **Reference Check:** Subagent reviews completed against referenced repos. The final readiness audit passed after freeze edits and closed `aerobeat-gameplay-runner-7l8`.
 
 **Commits:**
-- Pending.
+- Runner implementation pending on `aerobeat-gameplay-runner-an1`.
 
 **Lessons Learned:** Pending.
 
