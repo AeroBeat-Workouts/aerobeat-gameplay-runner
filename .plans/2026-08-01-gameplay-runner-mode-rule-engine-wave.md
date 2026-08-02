@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-01  
 **Status:** Draft  
-**Last Updated:** 2026-08-01 22:06 EDT  
-**Blocked Reason:** High-level phase order and runner/mode-core envelope split approved; waiting on later architecture freeze approvals before implementation.  
+**Last Updated:** 2026-08-01 22:08 EDT  
+**Blocked Reason:** High-level phase order and runner/mode-core envelope split approved; contract ownership freeze proposal in progress before implementation.  
 **Agent:** pico
 
 ---
@@ -154,15 +154,15 @@ Only after runner `.testbed` passes:
 
 ### Task 2: Freeze Contract Ownership
 
-**Bead ID:** `Pending`  
+**Bead ID:** `aerobeat-gameplay-runner-eni`  
 **SubAgent:** `primary`  
 **Role:** `research`  
 **References:** `REF-01`, `REF-03`, `REF-04`  
-**Prompt:** After Derrick approves the high-level plan, inspect runner and mode-core contract seams and propose exactly which DTOs/interfaces live in each repo. Do not implement; update this plan with the freeze proposal and wait for Derrick approval.
+**Prompt:** Claim bead `aerobeat-gameplay-runner-eni` at start. In the `research` role, inspect `aerobeat-gameplay-runner` and `aerobeat-mode-core` contract seams and propose exactly which v1 DTOs/interfaces live in each repo. Apply the approved boundary: `aerobeat-mode-core` owns portable mode contracts and mode-produced result fragments; `aerobeat-gameplay-runner` owns session-level envelopes, clock/timeline orchestration state, aggregation, and testbed transport. Do not implement code. Update this plan with the freeze proposal and leave the bead in progress for Derrick approval.
 
-**Status:** ⏳ Pending Approval
+**Status:** ⏳ In Progress
 
-**Results:** Pending.
+**Results:** Research bead created and claimed. Waiting for SubAgent contract ownership freeze proposal.
 
 ---
 
