@@ -1,0 +1,437 @@
+# Gameplay Runner And Mode Rule-Engine Implementation
+
+**Date:** 2026-08-02  
+**Status:** Draft  
+**Last Updated:** 2026-08-02 08:43 EDT  
+**Blocked Reason:** Awaiting Derrick approval to execute this new implementation plan  
+**Agent:** pico
+
+---
+
+## Goal
+
+Implement the frozen AeroBeat gameplay architecture through the existing mode-core, input-core, runner, Boxing, Flow, content, and runner testbed beads.
+
+---
+
+## Overview
+
+The architecture-freeze wave is complete and archived. The frozen direction is that `aerobeat-gameplay-runner` owns session orchestration, timeline dispatch, pause/resume/retry, result envelopes, event fanout, fake input/testbed transport, and aggregation. `aerobeat-mode-core` owns portable mode contracts and mode-produced fragments. Boxing and Flow repos own pure rule engines; they do not own product UI, camera providers, raw landmark processing, or assembly composition.
+
+This implementation wave should reduce risk by landing the shared contract seams first. `aerobeat-mode-core` adds the portable mode DTO/interface minimum, while `aerobeat-input-core` corrects Boxing punch events to no-arg active signals. Runner, Boxing, and Flow then adopt those seams independently before the runner `.testbed` composes them with content fixtures.
+
+The first implementation beads already exist from the previous session. Some adjacent repo Beads remotes still need sync repair before their local bead state can be pushed: mode-core has no Beads Dolt `origin`, and input-core, mode-boxing, mode-flow, and content-core reported Dolt `no common ancestor`. Do not force-push bead state; preserve both local and remote issue history.
+
+---
+
+## REFERENCES
+
+| ID | Description | Path |
+| --- | --- | --- |
+| `REF-01` | Frozen gameplay architecture discussion | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-core/.plans/archive/2026-08-01-aerobeat-gameplay-architecture-resume.md` |
+| `REF-02` | Completed runner/mode rule-engine planning freeze | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.plans/archive/2026-08-01-gameplay-runner-mode-rule-engine-wave.md` |
+| `REF-03` | Latest canonical handoff | `/home/derrick/.openclaw/workspace/projects/openclaw-pico/handoffs/handoff-2026-08-01T22-31-48-04-00-aerobeat.md` |
+| `REF-04` | Gameplay runner package | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/README.md` |
+| `REF-05` | Gameplay runner source | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/src/` |
+| `REF-06` | Shared mode contract repo | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-core/README.md` |
+| `REF-07` | Input-core Boxing contract | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/src/interfaces/boxing_input.gd` |
+| `REF-08` | Input manager Boxing signal mirror | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/src/input_manager.gd` |
+| `REF-09` | Boxing mode repo | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-boxing/README.md` |
+| `REF-10` | Flow mode repo | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-flow/README.md` |
+| `REF-11` | Content contract repo | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core/README.md` |
+| `REF-12` | Audio clock source repo | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-tool-audio-player/README.md` |
+
+---
+
+## Frozen Implementation Rules
+
+- `aerobeat-mode-core` owns `ModeDescriptor`, `ModeRunConfig`, `ModeRunner`, `ModeTickFrame`, `ModeEvent`, `ModeJudgementEvent`, `ModeScoreDelta`, `ModeRunFragment`, and `ModeFixtureCase` or their repo-conventional equivalents.
+- `aerobeat-gameplay-runner` owns `GameplayRunConfig`, `GameplayRunState`, `GameplayRunResult`, `GameplaySession`, `GameplayTimelineClock`, `GameplayInputStream`, event dispatch/history, score aggregation, fake streams, and `.testbed` transport.
+- Boxing punch signals are exact no-arg active events: `straight_left`, `straight_right`, `uppercut_left`, `uppercut_right`, `hook_left`, and `hook_right`.
+- Boxing v1 must not add punch `power`, `strength`, scalar intensity, confidence, velocity, detector score, or explicit `active` booleans.
+- Flow v1 primarily consumes `BodyCellInput` events: `left_wrist_cell_entered(cell, direction)`, `right_wrist_cell_entered(cell, direction)`, `nose_cell_entered(cell, direction)`, and `calibration_session_updated(session)`, plus optional Flow squat transitions.
+- Runner production clock consumption is limited to `reset()`, `get_position_sec()`, `get_duration_sec()`, `get_state()`, and `is_complete()`. Audio timing truth remains in `aerobeat-tool-audio-player`.
+- Tiny contract/rule fixtures land before BeatSaver-derived regression fixtures. BeatSaver fixtures use Derrick's approved pool from `REF-02`.
+
+---
+
+## Tasks
+
+### Task 1: Repair Beads Sync Readiness
+
+**Bead ID:** `afc-r7s`, `aerobeat-input-core-9r2`, `aerobeat-mode-boxing-0ui`, `aerobeat-mode-flow-bsb`, `aerobeat-content-core-gyn`  
+**SubAgent:** `primary`  
+**Role:** `research`  
+**References:** `REF-02`, `REF-03`  
+**Prompt:** Claim or update the relevant Beads sync repair bead(s) at start where possible. In the `research` role on `primary`, inspect Beads Dolt configuration/status for `aerobeat-mode-core`, `aerobeat-input-core`, `aerobeat-mode-boxing`, `aerobeat-mode-flow`, and `aerobeat-content-core`. Determine the non-destructive repair path for mode-core missing remote and the no-common-ancestor repos. Do not force-push or discard local/remote bead state. Report exact commands that are safe to run, any commands actually run, and final sync status. Leave implementation beads untouched unless sync repair directly requires metadata updates.
+
+**Folders Created/Deleted/Modified:**
+- Pending
+
+**Files Created/Deleted/Modified:**
+- Pending
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 2: Implement Portable Mode-Core Contracts
+
+**Bead ID:** `afc-z8o`  
+**SubAgent:** `primary`  
+**Role:** `coder`  
+**References:** `REF-01`, `REF-02`, `REF-06`  
+**Prompt:** Claim bead `afc-z8o` with `bd update afc-z8o --claim --json` at start. In the `coder` role on `primary`, implement the approved portable mode-core v1 contract minimum: mode descriptor/config, mode runner lifecycle, tick frame, mode event/judgement/score/run fragments, and tiny contract fixtures/tests using repo-local conventions. Keep session envelopes, clocks, fake streams, testbed transport, camera/provider debug payloads, and assembly concerns out of mode-core. Run relevant repo tests and validation, perform any required Godot fresh-open/log pass if runtime scenes or Godot UI paths are touched, then commit and push. Do not close the bead unless the implementation and validation are complete.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-core/`
+
+**Files Created/Deleted/Modified:**
+- Pending
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 3: QA Mode-Core Contracts
+
+**Bead ID:** `afc-z8o`  
+**SubAgent:** `primary`  
+**Role:** `qa`  
+**References:** `REF-01`, `REF-02`, `REF-06`  
+**Prompt:** With bead `afc-z8o` still active, perform an independent QA pass on the mode-core contract implementation. Verify the new contracts match the frozen ownership rules, fixtures/tests exercise the contract seam, no runner/session/clock/testbed transport concerns leaked into mode-core, and the coder's validation evidence is real. Run the highest-fidelity repo validation available and repeat the Godot fresh-open/log pass if relevant. Report pass/fail with exact evidence; do not close the bead.
+
+**Folders Created/Deleted/Modified:**
+- Pending
+
+**Files Created/Deleted/Modified:**
+- Pending
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 4: Audit Mode-Core Contracts
+
+**Bead ID:** `afc-z8o`  
+**SubAgent:** `primary`  
+**Role:** `auditor`  
+**References:** `REF-01`, `REF-02`, `REF-06`  
+**Prompt:** Independently audit bead `afc-z8o` against the plan, freeze references, diff, and validation output. If complete, close `afc-z8o` with `bd close afc-z8o --reason "Implemented, QA verified, and audited against frozen mode-core contract scope" --json`. If not complete, leave it open and report the exact gap.
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 5: Correct Input-Core Boxing Punch Signals
+
+**Bead ID:** `aerobeat-input-core-6xl`  
+**SubAgent:** `primary`  
+**Role:** `coder`  
+**References:** `REF-01`, `REF-02`, `REF-07`, `REF-08`  
+**Prompt:** Claim bead `aerobeat-input-core-6xl` with `bd update aerobeat-input-core-6xl --claim --json` at start. In the `coder` role on `primary`, update `BoxingInput` and `InputManager` proxy punch signals/callbacks to exact no-arg active events for straight/hook/uppercut left/right. Remove power/scalar forwarding and do not add active booleans or intensity fields. Update focused tests/docs where available, run repo validation, perform any required Godot fresh-open/log pass if runtime scenes or Godot UI paths are touched, then commit and push. Do not close the bead unless implementation and validation are complete.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/`
+
+**Files Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/src/interfaces/boxing_input.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/src/input_manager.gd`
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 6: QA Input-Core Punch Correction
+
+**Bead ID:** `aerobeat-input-core-6xl`  
+**SubAgent:** `primary`  
+**Role:** `qa`  
+**References:** `REF-01`, `REF-02`, `REF-07`, `REF-08`  
+**Prompt:** With bead `aerobeat-input-core-6xl` still active, independently verify the Boxing punch signals and proxies are exact no-arg active events and no v1 punch scalar/active boolean leaked into contracts, tests, or docs. Run the highest-fidelity repo validation available and repeat the Godot fresh-open/log pass if relevant. Report pass/fail; do not close the bead.
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 7: Audit Input-Core Punch Correction
+
+**Bead ID:** `aerobeat-input-core-6xl`  
+**SubAgent:** `primary`  
+**Role:** `auditor`  
+**References:** `REF-01`, `REF-02`, `REF-07`, `REF-08`  
+**Prompt:** Independently audit bead `aerobeat-input-core-6xl` against the plan, freeze references, diff, and validation output. If complete, close `aerobeat-input-core-6xl` with `bd close aerobeat-input-core-6xl --reason "Implemented, QA verified, and audited against frozen no-arg Boxing input contract" --json`. If not complete, leave it open and report the exact gap.
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 8: Adopt Contracts In Gameplay Runner
+
+**Bead ID:** `aerobeat-gameplay-runner-snf`  
+**SubAgent:** `primary`  
+**Role:** `coder`  
+**References:** `REF-01`, `REF-02`, `REF-04`, `REF-05`, `REF-12`  
+**Prompt:** Claim bead `aerobeat-gameplay-runner-snf` with `bd update aerobeat-gameplay-runner-snf --claim --json` at start, after `afc-z8o` and `aerobeat-input-core-6xl` are complete. In the `coder` role on `primary`, adopt the new mode-core mode runner/event/judgement/score fragments, switch `GameplayTimelineClock` production seam to `reset/get_position_sec/get_duration_sec/get_state/is_complete`, add runner-owned fake input stream envelopes that mirror input-core signal contracts, and cover lifecycle, dispatch order, terminal states, and aggregation with focused tests. Keep audio clock truth in `aerobeat-tool-audio-player` and keep fake clocks as runner test infrastructure. Run repo validation and Godot fresh-open/log inspection for the `.testbed` or runtime scene seam if touched, then commit and push. Do not close the bead unless implementation and validation are complete.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/`
+
+**Files Created/Deleted/Modified:**
+- Pending
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 9: QA Gameplay Runner Contract Adoption
+
+**Bead ID:** `aerobeat-gameplay-runner-snf`  
+**SubAgent:** `primary`  
+**Role:** `qa`  
+**References:** `REF-01`, `REF-02`, `REF-04`, `REF-05`, `REF-12`  
+**Prompt:** With bead `aerobeat-gameplay-runner-snf` still active, independently verify runner contract adoption, sampled clock behavior, fake input envelope fidelity, lifecycle/dispatch/terminal state/aggregation tests, and no mode-core ownership leakage. Run the highest-fidelity repo validation available and repeat fresh Godot scene-open/log inspection for the `.testbed` or runtime seam if touched. Report pass/fail; do not close the bead.
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 10: Audit Gameplay Runner Contract Adoption
+
+**Bead ID:** `aerobeat-gameplay-runner-snf`  
+**SubAgent:** `primary`  
+**Role:** `auditor`  
+**References:** `REF-01`, `REF-02`, `REF-04`, `REF-05`, `REF-12`  
+**Prompt:** Independently audit bead `aerobeat-gameplay-runner-snf` against the plan, freeze references, diff, and validation output. If complete, close `aerobeat-gameplay-runner-snf` with `bd close aerobeat-gameplay-runner-snf --reason "Implemented, QA verified, and audited against frozen runner contract and clock scope" --json`. If not complete, leave it open and report the exact gap.
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 11: Implement Boxing Pure Rule Engine
+
+**Bead ID:** `aerobeat-mode-boxing-hz4`  
+**SubAgent:** `primary`  
+**Role:** `coder`  
+**References:** `REF-01`, `REF-02`, `REF-09`  
+**Prompt:** Claim bead `aerobeat-mode-boxing-hz4` with `bd update aerobeat-mode-boxing-hz4 --claim --json` at start, after `afc-z8o` and `aerobeat-input-core-6xl` are complete. In the `coder` role on `primary`, implement a pure Boxing v1 mode runner over normalized no-arg Boxing events: straight/hook/uppercut left/right, guard, squat, and weave transitions. Evaluate authored targets against timing windows and tiny fake input fixtures; emit mode-core judgement/score/run fragments. Do not depend on runner, camera, raw landmarks, detector payloads, UI shell, or assembly. Run repo validation and any relevant Godot fresh-open/log pass, then commit and push. Do not close the bead unless implementation and validation are complete.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-boxing/`
+
+**Files Created/Deleted/Modified:**
+- Pending
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 12: QA Boxing Pure Rule Engine
+
+**Bead ID:** `aerobeat-mode-boxing-hz4`  
+**SubAgent:** `primary`  
+**Role:** `qa`  
+**References:** `REF-01`, `REF-02`, `REF-09`  
+**Prompt:** With bead `aerobeat-mode-boxing-hz4` still active, independently verify the Boxing engine is pure, consumes the frozen no-arg input events, emits mode-core fragments, covers hit/miss/early/late/combo/completion fixture behavior, and has no runner/camera/UI/assembly dependency. Run the highest-fidelity repo validation available and repeat any relevant Godot fresh-open/log pass. Report pass/fail; do not close the bead.
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 13: Audit Boxing Pure Rule Engine
+
+**Bead ID:** `aerobeat-mode-boxing-hz4`  
+**SubAgent:** `primary`  
+**Role:** `auditor`  
+**References:** `REF-01`, `REF-02`, `REF-09`  
+**Prompt:** Independently audit bead `aerobeat-mode-boxing-hz4` against the plan, freeze references, diff, and validation output. If complete, close `aerobeat-mode-boxing-hz4` with `bd close aerobeat-mode-boxing-hz4 --reason "Implemented, QA verified, and audited against frozen pure Boxing rule-engine scope" --json`. If not complete, leave it open and report the exact gap.
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 14: Implement Flow Pure Rule Engine
+
+**Bead ID:** `aerobeat-mode-flow-346`  
+**SubAgent:** `primary`  
+**Role:** `coder`  
+**References:** `REF-01`, `REF-02`, `REF-10`  
+**Prompt:** Claim bead `aerobeat-mode-flow-346` with `bd update aerobeat-mode-flow-346 --claim --json` at start, after `afc-z8o` is complete. In the `coder` role on `primary`, implement a pure Flow v1 mode runner over `BodyCellInput` events plus Flow squat transitions. Cover left/right wrist hits, direction-required and directionless notes, nose/obstacle semantics if retained, tiny fake input fixtures, and mode-core judgement/score/run fragments. Do not depend on runner, camera, raw landmarks, detector payloads, UI shell, or assembly. Run repo validation and any relevant Godot fresh-open/log pass, then commit and push. Do not close the bead unless implementation and validation are complete.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-flow/`
+
+**Files Created/Deleted/Modified:**
+- Pending
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 15: QA Flow Pure Rule Engine
+
+**Bead ID:** `aerobeat-mode-flow-346`  
+**SubAgent:** `primary`  
+**Role:** `qa`  
+**References:** `REF-01`, `REF-02`, `REF-10`  
+**Prompt:** With bead `aerobeat-mode-flow-346` still active, independently verify the Flow engine is pure, consumes the frozen BodyCellInput/Flow squat surface, emits mode-core fragments, covers required tiny fixture behavior, and has no runner/camera/UI/assembly dependency. Run the highest-fidelity repo validation available and repeat any relevant Godot fresh-open/log pass. Report pass/fail; do not close the bead.
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 16: Audit Flow Pure Rule Engine
+
+**Bead ID:** `aerobeat-mode-flow-346`  
+**SubAgent:** `primary`  
+**Role:** `auditor`  
+**References:** `REF-01`, `REF-02`, `REF-10`  
+**Prompt:** Independently audit bead `aerobeat-mode-flow-346` against the plan, freeze references, diff, and validation output. If complete, close `aerobeat-mode-flow-346` with `bd close aerobeat-mode-flow-346 --reason "Implemented, QA verified, and audited against frozen pure Flow rule-engine scope" --json`. If not complete, leave it open and report the exact gap.
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 17: Convert BeatSaver Regression Fixtures
+
+**Bead ID:** `aerobeat-content-core-xba`  
+**SubAgent:** `primary`  
+**Role:** `coder`  
+**References:** `REF-02`, `REF-11`  
+**Prompt:** Claim bead `aerobeat-content-core-xba` with `bd update aerobeat-content-core-xba --claim --json` at start, after tiny mode/runner contracts pass. In the `coder` role on `primary`, convert Derrick's approved BeatSaver candidate pool from `REF-02` into content-core song-package/chart regression fixtures. Preserve group intent for Sonic speed, K-Pop and Game Grumps/NSP simpler references, and Linkin Park mid-level Expert baseline. Validate through content-core contracts before runner or mode tests consume them. Run repo validation and any relevant Godot fresh-open/log pass, then commit and push. Do not close the bead unless implementation and validation are complete.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core/`
+
+**Files Created/Deleted/Modified:**
+- Pending
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 18: QA BeatSaver Regression Fixtures
+
+**Bead ID:** `aerobeat-content-core-xba`  
+**SubAgent:** `primary`  
+**Role:** `qa`  
+**References:** `REF-02`, `REF-11`  
+**Prompt:** With bead `aerobeat-content-core-xba` still active, independently verify the BeatSaver-derived fixtures preserve the approved candidate pool and validate through content-core contracts. Confirm fixture files are small enough or separated enough for useful regression debugging where applicable. Run highest-fidelity repo validation and repeat any relevant Godot fresh-open/log pass. Report pass/fail; do not close the bead.
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 19: Audit BeatSaver Regression Fixtures
+
+**Bead ID:** `aerobeat-content-core-xba`  
+**SubAgent:** `primary`  
+**Role:** `auditor`  
+**References:** `REF-02`, `REF-11`  
+**Prompt:** Independently audit bead `aerobeat-content-core-xba` against the plan, approved BeatSaver pool, diff, and validation output. If complete, close `aerobeat-content-core-xba` with `bd close aerobeat-content-core-xba --reason "Implemented, QA verified, and audited against approved BeatSaver regression fixture scope" --json`. If not complete, leave it open and report the exact gap.
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 20: Compose Runner Testbed Full-Run Regressions
+
+**Bead ID:** `aerobeat-gameplay-runner-yij`  
+**SubAgent:** `primary`  
+**Role:** `coder`  
+**References:** `REF-01`, `REF-02`, `REF-04`, `REF-05`, `REF-09`, `REF-10`, `REF-11`  
+**Prompt:** Claim bead `aerobeat-gameplay-runner-yij` with `bd update aerobeat-gameplay-runner-yij --claim --json` at start, after runner contract adoption, Boxing engine, Flow engine, and BeatSaver fixture conversion are complete. In the `coder` role on `primary`, compose `aerobeat-gameplay-runner/.testbed` with runner, mode-core, content-core, input-core, Boxing, and Flow engines. Run tiny fixture songs with fake clocks/input streams first, then BeatSaver-converted regression fixtures. Validate headless import/GUT where possible and perform fresh Godot scene-open/log inspection for this runtime testbed seam. Resolve unexpected warnings/errors or document accepted exceptions, then commit and push. Do not close the bead unless implementation and validation are complete.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed/`
+
+**Files Created/Deleted/Modified:**
+- Pending
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 21: QA Runner Testbed Full-Run Regressions
+
+**Bead ID:** `aerobeat-gameplay-runner-yij`  
+**SubAgent:** `primary`  
+**Role:** `qa`  
+**References:** `REF-01`, `REF-02`, `REF-04`, `REF-05`, `REF-09`, `REF-10`, `REF-11`  
+**Prompt:** With bead `aerobeat-gameplay-runner-yij` still active, independently verify the runner `.testbed` composition in the highest-fidelity environment available. Confirm tiny fixture runs pass before BeatSaver regressions, verify runner/mode/content/input seams are composed through the frozen boundaries, run automated validation, and repeat fresh Godot scene-open/log inspection. Unexpected runtime warnings fail unless explicitly accepted in this plan or bead notes. Report pass/fail; do not close the bead.
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+### Task 22: Audit Runner Testbed Full-Run Regressions
+
+**Bead ID:** `aerobeat-gameplay-runner-yij`  
+**SubAgent:** `primary`  
+**Role:** `auditor`  
+**References:** `REF-01`, `REF-02`, `REF-04`, `REF-05`, `REF-09`, `REF-10`, `REF-11`  
+**Prompt:** Independently audit bead `aerobeat-gameplay-runner-yij` against the plan, frozen references, diff, validation output, and Godot fresh-open/log evidence. If complete, close `aerobeat-gameplay-runner-yij` with `bd close aerobeat-gameplay-runner-yij --reason "Implemented, QA verified, and audited against frozen runner testbed regression scope" --json`. If not complete, leave it open and report the exact gap.
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
+## Final Results
+
+**Status:** Pending
+
+**What We Built:** Pending.
+
+**Reference Check:** Pending.
+
+**Commits:** Pending.
+
+**Lessons Learned:** Pending.
+
+---
+
+*Drafted on 2026-08-02*
