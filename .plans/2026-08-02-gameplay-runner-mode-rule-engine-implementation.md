@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-02  
 **Status:** In Progress  
-**Last Updated:** 2026-08-02 10:07 EDT  
+**Last Updated:** 2026-08-02 10:14 EDT  
 **Blocked Reason:** None  
 **Agent:** pico
 
@@ -209,11 +209,25 @@ The first implementation beads already exist from the previous session. Some adj
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/`
 
 **Files Created/Deleted/Modified:**
-- Pending
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed/addons.jsonc`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed/tests/test_gameplay_runner_contract.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed/tests/support/fake_gameplay_clock.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed/tests/support/fake_gameplay_clock.gd.uid`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed/tests/support/fake_gameplay_input_stream.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed/tests/support/fake_gameplay_input_stream.gd.uid`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/src/AeroGameplayRunner.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/src/data_types/gameplay_run_config.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/src/data_types/gameplay_run_result.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/src/interfaces/gameplay_input_stream.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/src/interfaces/gameplay_mode_runner.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/src/interfaces/gameplay_timeline_clock.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/src/runtime/gameplay_event_dispatcher.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/src/runtime/gameplay_score_aggregator.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/src/runtime/gameplay_session.gd`
 
-**Status:** ⏳ In Progress
+**Status:** ✅ Complete
 
-**Results:** Spawned `primary` SubAgent in the `coder` role after parent verification that upstream blockers `afc-z8o` and `aerobeat-input-core-6xl` are closed.
+**Results:** PASS pending QA/audit. `primary` coder adopted mode-core contracts in commit `bd0bf616b475b27ea012b3dded168b5b607ec2af`, pushed to `main`. Runner now derives `ModeRunConfig`, ticks mode runners with `ModeTickFrame`, captures `ModeRunFragment`, `ModeJudgementEvent`, and `ModeScoreDelta`, and wraps those fragments into runner-owned session/result envelopes. `GameplayTimelineClock` production consumption is narrowed to `reset()`, `get_position_sec()`, `get_duration_sec()`, `get_state()`, and `is_complete()`, with `advance()` retained only on the fake test clock. Runner-owned fake input stream envelopes now mirror input-core contracts, including no-arg Boxing punch events. GodotEnv sync was run with `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo /home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed`. Validation reported by coder: headless import passed with accepted vendored GUT invalid-UID warnings and headless ObjectDB leak warning, GUT passed 4/4 tests with 50 assertions, and `.testbed` scene load passed cleanly. Parent verification confirmed `bd0bf61` is the pushed `main` tip, runner git is clean, and bead `aerobeat-gameplay-runner-snf` remains `in_progress` for QA/audit.
 
 ---
 
@@ -225,9 +239,9 @@ The first implementation beads already exist from the previous session. Some adj
 **References:** `REF-01`, `REF-02`, `REF-04`, `REF-05`, `REF-12`  
 **Prompt:** With bead `aerobeat-gameplay-runner-snf` still active, independently verify runner contract adoption, sampled clock behavior, fake input envelope fidelity, lifecycle/dispatch/terminal state/aggregation tests, and no mode-core ownership leakage. Run the highest-fidelity repo validation available and repeat fresh Godot scene-open/log inspection for the `.testbed` or runtime seam if touched. Report pass/fail; do not close the bead.
 
-**Status:** ⏳ Pending
+**Status:** ⏳ In Progress
 
-**Results:** Pending.
+**Results:** Spawned `primary` SubAgent in the `qa` role after parent verification that Task 8 implementation commit `bd0bf616b475b27ea012b3dded168b5b607ec2af` is pushed, runner git is clean, and bead `aerobeat-gameplay-runner-snf` remains open for QA/audit.
 
 ---
 
