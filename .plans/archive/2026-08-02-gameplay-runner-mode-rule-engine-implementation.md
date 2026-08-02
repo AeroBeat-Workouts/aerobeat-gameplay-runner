@@ -1,8 +1,8 @@
 # Gameplay Runner And Mode Rule-Engine Implementation
 
 **Date:** 2026-08-02  
-**Status:** In Progress  
-**Last Updated:** 2026-08-02 10:53 EDT  
+**Status:** Complete  
+**Last Updated:** 2026-08-02 11:45 EDT  
 **Blocked Reason:** None  
 **Agent:** pico
 
@@ -349,9 +349,9 @@ The first implementation beads already exist from the previous session. Some adj
 **References:** `REF-01`, `REF-02`, `REF-10`  
 **Prompt:** With bead `aerobeat-mode-flow-346` still active, independently verify the Flow engine is pure, consumes the frozen BodyCellInput/Flow squat surface, emits mode-core fragments, covers required tiny fixture behavior, and has no runner/camera/UI/assembly dependency. Run the highest-fidelity repo validation available and repeat any relevant Godot fresh-open/log pass. Report pass/fail; do not close the bead.
 
-**Status:** ⏳ Pending
+**Status:** ✅ Complete
 
-**Results:** Pending.
+**Results:** PASS. `primary` QA independently verified `aerobeat-mode-flow-346` against `REF-01`, `REF-02`, `REF-10`, Task 15, commit `44fd778`, and the current tree. QA confirmed `src/flow_mode_runner.gd` extends only mode-core `ModeRunner`, consumes frozen Flow input rows (`left_wrist_cell_entered(cell, direction)`, `right_wrist_cell_entered(cell, direction)`, `nose_cell_entered(cell, direction)`, and no-arg `squat_enabled`/`squat_disabled`), emits `ModeJudgementEvent`, `ModeScoreDelta`, and `ModeRunFragment`, and has no gameplay runner/session/clock/fake-stream, camera provider, raw landmark, detector payload, UI shell, or assembly dependency outside descriptive README/plugin text. QA reran GodotEnv sync, headless import, GUT, and bounded headless editor fresh-open. GodotEnv sync passed; import passed with accepted vendored GUT invalid-UID warnings and accepted headless ObjectDB shutdown warning; GUT passed 9/9 tests with 40 assertions; bounded editor fresh-open reached `DONE` with timeout exit 124 accepted for the bounded check and only accepted vendored GUT invalid-UID warnings. QA evidence was added to bead notes, `bd dolt push` completed, and bead `aerobeat-mode-flow-346` remains `in_progress` for audit.
 
 ---
 
@@ -363,9 +363,9 @@ The first implementation beads already exist from the previous session. Some adj
 **References:** `REF-01`, `REF-02`, `REF-10`  
 **Prompt:** Independently audit bead `aerobeat-mode-flow-346` against the plan, freeze references, diff, and validation output. If complete, close `aerobeat-mode-flow-346` with `bd close aerobeat-mode-flow-346 --reason "Implemented, QA verified, and audited against frozen pure Flow rule-engine scope" --json`. If not complete, leave it open and report the exact gap.
 
-**Status:** ⏳ Pending
+**Status:** ✅ Complete
 
-**Results:** Pending.
+**Results:** PASS. `primary` auditor independently audited `aerobeat-mode-flow-346` against the active plan, `REF-01`, `REF-02`, `REF-10`, implementation commit `44fd778`, QA notes, and the current source. Auditor confirmed the Flow runner depends only on mode-core contracts, consumes BodyCellInput wrist/nose rows plus no-arg Flow squat transitions, emits `ModeJudgementEvent`, `ModeScoreDelta`, and `ModeRunFragment`, and has no gameplay runner/session/clock/fake-stream, camera, raw landmark, detector payload, UI shell, or assembly dependency. Auditor reran GodotEnv sync, headless import, GUT, and bounded editor fresh-open. GodotEnv sync passed; import passed with only accepted vendored GUT invalid-UID warnings and accepted ObjectDB shutdown warning; GUT passed 9/9 tests with 40 assertions; bounded fresh-open reached `DONE` with timeout exit 124 accepted. `aerobeat-mode-flow-346` was closed with reason `Implemented, QA verified, and audited against frozen pure Flow rule-engine scope`, and `bd dolt push` completed. Parent verification confirmed the bead is closed and mode-flow is clean.
 
 ---
 
@@ -381,11 +381,18 @@ The first implementation beads already exist from the previous session. Some adj
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core/`
 
 **Files Created/Deleted/Modified:**
-- Pending
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core/README.md`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core/data_types/song_package.gd.uid`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core/fixtures/beatsaver_regression_pool/`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core/tests/run_contract_tests.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core/tests/test_beatsaver_regression_fixtures.gd`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core/tests/test_beatsaver_regression_fixtures.gd.uid`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core/tests/test_song_package_yaml_contract.gd.uid`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core/tests/test_song_preview_audio_contract.gd.uid`
 
-**Status:** ⏳ Pending
+**Status:** ✅ Complete
 
-**Results:** Pending.
+**Results:** PASS pending QA/audit. `primary` coder converted the approved BeatSaver candidate pool into 14 small content-core regression fixtures in commit `2b47be0`, pushed to `main`. Fixtures preserve the exact approved IDs and group intent from `REF-02`: Sonic fast upper-end speed (`29be2`, `349f2`, `2b4e6`, `304ea`), K-Pop simpler references (`48727`, `48088`, `48792`, `47fb6`), Game Grumps/NSP simpler/meme references (`3d44b`, `472d3`), and Linkin Park mid-level Expert baseline (`226e`, `2f3d7`, `4858`, `19e5e`). The implementation intentionally uses synthetic contract-valid metadata/package/chart slices and documents that full BeatSaver map archives, audio, and cover assets are omitted. GodotEnv sync was not used because `.testbed/addons.jsonc` and installed addon state did not change. Validation reported by coder and repeated by Pico: `godot --headless --path .testbed --script res://../tests/run_contract_tests.gd` passed with `beatsaver_regression_fixtures` covering 14 valid cases, `godot --headless --path .testbed --import` passed, and `timeout 12s godot --headless --editor --path .testbed` reached editor loading `DONE` with timeout exit 124 accepted for the bounded fresh-open check. Bead `aerobeat-content-core-xba` remains `in_progress` for QA/audit.
 
 ---
 
@@ -397,9 +404,9 @@ The first implementation beads already exist from the previous session. Some adj
 **References:** `REF-02`, `REF-11`  
 **Prompt:** With bead `aerobeat-content-core-xba` still active, independently verify the BeatSaver-derived fixtures preserve the approved candidate pool and validate through content-core contracts. Confirm fixture files are small enough or separated enough for useful regression debugging where applicable. Run highest-fidelity repo validation and repeat any relevant Godot fresh-open/log pass. Report pass/fail; do not close the bead.
 
-**Status:** ⏳ Pending
+**Status:** ✅ Complete
 
-**Results:** Pending.
+**Results:** PASS. `primary` QA independently verified commit `2b47be0` and the current `aerobeat-content-core` tree against Task 18, `REF-02`, and `REF-11`. QA confirmed the approved BeatSaver pool is preserved exactly as 14 fixtures: Sonic (`29be2`, `349f2`, `2b4e6`, `304ea`), K-Pop (`48727`, `48088`, `48792`, `47fb6`), Game Grumps/NSP (`3d44b`, `472d3`), and Linkin Park (`226e`, `2f3d7`, `4858`, `19e5e`). Fixture validation runs through `ContentPackageValidator`, checks source/regression metadata, mode/difficulty, chart source metadata, nonempty beats, and duplicate rejection. QA confirmed the synthetic fixture limitation is documented in fixture README and repo README: contract-valid metadata/chart slices only, with full BeatSaver maps, audio, and cover assets omitted. Fixture layout is regression-friendly: one BeatSaver ID directory with one small `song.package.yaml` and one chart file per package. GodotEnv sync omission is plausible because commit `2b47be0` did not change `.testbed/addons.jsonc` or installed addon state. QA reran content-core contract tests, headless import, and bounded editor fresh-open/log validation; all passed with no unexpected warnings/errors. QA evidence was added to bead notes, `bd dolt push` completed, and bead `aerobeat-content-core-xba` remains `in_progress` for audit.
 
 ---
 
@@ -411,9 +418,9 @@ The first implementation beads already exist from the previous session. Some adj
 **References:** `REF-02`, `REF-11`  
 **Prompt:** Independently audit bead `aerobeat-content-core-xba` against the plan, approved BeatSaver pool, diff, and validation output. If complete, close `aerobeat-content-core-xba` with `bd close aerobeat-content-core-xba --reason "Implemented, QA verified, and audited against approved BeatSaver regression fixture scope" --json`. If not complete, leave it open and report the exact gap.
 
-**Status:** ⏳ Pending
+**Status:** ✅ Complete
 
-**Results:** Pending.
+**Results:** PASS. `primary` auditor independently audited `aerobeat-content-core-xba` against active Task 19, `REF-02`, `REF-11`, implementation commit `2b47be0`, fixture docs, QA notes, and the current tree. Auditor confirmed all 14 approved BeatSaver IDs are preserved exactly, with one small `song.package.yaml` and one chart YAML per BeatSaver ID; synthetic limitations are documented in the fixture README, repo README, and test output; and GodotEnv sync omission is acceptable because `.testbed/addons.jsonc` and installed addon state did not change. Auditor reran content-core contract tests, headless import, and bounded editor fresh-open/log validation. Contract tests passed with `beatsaver_regression_fixtures` `caseCount: 14` and `invalidCases: []`; import passed cleanly; bounded editor fresh-open reached `DONE` with timeout exit 124 accepted and no unexpected warnings/errors. `aerobeat-content-core-xba` was closed with reason `Implemented, QA verified, and audited against approved BeatSaver regression fixture scope`, and `bd dolt push` completed. Parent verification confirmed the bead is closed and content-core is clean.
 
 ---
 
@@ -434,7 +441,7 @@ The first implementation beads already exist from the previous session. Some adj
 
 **Status:** ✅ Implemented pending QA/audit
 
-**Results:** PASS pending QA/audit. `primary` coder composed the runner `.testbed` with runner, mode-core, content-core, input-core, Boxing, and Flow through GodotEnv symlink addons. GodotEnv sync was run with `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo /home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed`. The GUT suite now verifies input-core signal contract composition, actual `BoxingModeRunner` and `FlowModeRunner` descriptors, tiny Boxing and Flow full runs with fake clocks/input streams before BeatSaver coverage, content-core validation for all 14 approved BeatSaver regression fixtures, and full runner sessions over those fixtures using the real Boxing/Flow engines. Validation reported by coder: GodotEnv sync passed; `godot --headless --path .testbed --import` passed with accepted vendored GUT invalid-UID warnings and accepted headless ObjectDB shutdown warning; GUT passed 6/6 tests with 148 assertions and no orphan/resource warnings; `timeout 12s godot --headless --path .testbed res://scenes/gameplay_runner_testbed.tscn --quit-after 1` passed cleanly. Bead `aerobeat-gameplay-runner-yij` remains `in_progress` for QA/audit.
+**Results:** PASS pending QA/audit. `primary` coder composed the runner `.testbed` with runner, mode-core, content-core, input-core, Boxing, and Flow through GodotEnv symlink addons in commit `4132991`, pushed to `main`. GodotEnv sync was run with `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo /home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed`. The GUT suite now verifies input-core signal contract composition, actual `BoxingModeRunner` and `FlowModeRunner` descriptors, tiny Boxing and Flow full runs with fake clocks/input streams before BeatSaver coverage, content-core validation for all 14 approved BeatSaver regression fixtures, and full runner sessions over those fixtures using the real Boxing/Flow engines. Validation reported by coder and repeated by Pico: GodotEnv sync passed; `godot --headless --path .testbed --import` passed with accepted vendored GUT invalid-UID warnings and accepted headless ObjectDB shutdown warning; GUT passed 6/6 tests with 148 assertions and no orphan/resource warnings; `timeout 12s godot --headless --path .testbed res://scenes/gameplay_runner_testbed.tscn --quit-after 1` passed cleanly. Bead `aerobeat-gameplay-runner-yij` remains `in_progress` for QA/audit.
 
 ---
 
@@ -446,9 +453,9 @@ The first implementation beads already exist from the previous session. Some adj
 **References:** `REF-01`, `REF-02`, `REF-04`, `REF-05`, `REF-09`, `REF-10`, `REF-11`  
 **Prompt:** With bead `aerobeat-gameplay-runner-yij` still active, independently verify the runner `.testbed` composition in the highest-fidelity environment available. Confirm tiny fixture runs pass before BeatSaver regressions, verify runner/mode/content/input seams are composed through the frozen boundaries, run automated validation, and repeat fresh Godot scene-open/log inspection. Unexpected runtime warnings fail unless explicitly accepted in this plan or bead notes. Report pass/fail; do not close the bead.
 
-**Status:** ⏳ Pending
+**Status:** ✅ Complete
 
-**Results:** Pending.
+**Results:** PASS. `primary` QA independently verified commit `4132991` and the current `.testbed` composition against Task 21. QA confirmed `.testbed/addons.jsonc` and installed symlinks compose runner, mode-core, input-core, content-core, Boxing, and Flow via GodotEnv symlink addons. Coverage composes frozen seams at the boundary through input-core contracts, content-core validation, and real `BoxingModeRunner`/`FlowModeRunner` execution through `GameplaySession`. QA confirmed tiny Boxing and Flow full sessions run before the BeatSaver regression loop, all 14 approved BeatSaver IDs validate through content-core and complete through real Boxing/Flow runners, and boundary scans found no mode/content/input bypass or duplicated mode-engine logic in runner testbed code. QA reran GodotEnv sync, headless import, GUT, and bounded scene load/log validation. Sync passed; import passed with only plan-accepted vendored GUT invalid-UID warnings and accepted headless ObjectDB shutdown warning; GUT passed 6/6 tests with 148 assertions; bounded scene load passed cleanly. QA evidence was added to bead notes, `bd dolt push` completed, and bead `aerobeat-gameplay-runner-yij` remains `in_progress` for audit.
 
 ---
 
@@ -460,24 +467,32 @@ The first implementation beads already exist from the previous session. Some adj
 **References:** `REF-01`, `REF-02`, `REF-04`, `REF-05`, `REF-09`, `REF-10`, `REF-11`  
 **Prompt:** Independently audit bead `aerobeat-gameplay-runner-yij` against the plan, frozen references, diff, validation output, and Godot fresh-open/log evidence. If complete, close `aerobeat-gameplay-runner-yij` with `bd close aerobeat-gameplay-runner-yij --reason "Implemented, QA verified, and audited against frozen runner testbed regression scope" --json`. If not complete, leave it open and report the exact gap.
 
-**Status:** ⏳ Pending
+**Status:** ✅ Complete
 
-**Results:** Pending.
+**Results:** PASS. `primary` auditor independently audited bead `aerobeat-gameplay-runner-yij` against Task 22, frozen references, implementation commit `4132991`, bead/QA evidence, current `.testbed` composition, validation output, and fresh scene-open/log evidence. Auditor confirmed `.testbed/addons.jsonc` and installed symlinks compose runner, mode-core, input-core, content-core, Boxing, and Flow via GodotEnv symlink addons; the GUT suite runs tiny Boxing and Flow full sessions before the BeatSaver regression pool; all 14 approved BeatSaver fixture IDs validate through content-core and complete through `GameplaySession` using real `BoxingModeRunner`/`FlowModeRunner`; and runner testbed helper code does not bypass frozen mode/content/input boundaries or duplicate mode engine logic. Auditor reran GodotEnv sync, headless import, GUT, and bounded scene load/log validation. Sync passed; import passed with only accepted vendored GUT invalid-UID warnings and accepted headless ObjectDB shutdown warning; GUT passed 6/6 tests with 148 assertions; bounded scene load passed cleanly. `aerobeat-gameplay-runner-yij` was closed with reason `Implemented, QA verified, and audited against frozen runner testbed regression scope`, and `bd dolt push` completed.
 
 ---
 
 ## Final Results
 
-**Status:** Pending
+**Status:** ✅ Complete
 
-**What We Built:** Pending.
+**What We Built:** Implemented the frozen AeroBeat gameplay runner and pure mode rule-engine wave across the involved repos. Mode-core now owns portable mode contracts, input-core exposes exact no-arg Boxing punch events, gameplay-runner adopts mode-core fragments and runner-owned session/result envelopes, Boxing and Flow implement pure rule engines, content-core carries the approved 14-map BeatSaver regression fixture pool, and the runner `.testbed` now composes runner/mode/input/content repos through GodotEnv symlink addons for tiny and BeatSaver full-run regressions.
 
-**Reference Check:** Pending.
+**Reference Check:** `REF-01`/`REF-02` architecture boundaries were preserved: runner owns orchestration/session/clock/fake-stream concerns, mode-core owns portable mode contracts, Boxing/Flow own pure mode logic, input-core owns input contracts, and content-core owns package/chart validation. `REF-11` BeatSaver regression fixtures preserve the approved 14 fixture IDs exactly and document synthetic limitations. `REF-13`/`REF-14` GodotEnv sync was used for dependency manifest/install changes.
 
-**Commits:** Pending.
+**Commits:**
+- `e0027f8` - Implement portable mode-core contracts
+- `e03795f` - Make Boxing punch signals no-arg
+- `8aedd7b` - Commit input-core generated script UIDs
+- `bd0bf61` - Adopt mode-core contracts in gameplay runner
+- `78e8c5e` - Implement pure Boxing rule engine
+- `44fd778` - Implement pure Flow rule engine
+- `2b47be0` - Add BeatSaver regression pool fixtures
+- `4132991` - Add runner testbed full-run regressions
 
-**Lessons Learned:** Pending.
+**Lessons Learned:** The cross-repo dependency shape is workable, but the runner plan needs to stay explicit about which repo owns each seam. GodotEnv sync plus clean Beads remotes made the later runner composition much smoother than ad-hoc addon changes would have.
 
 ---
 
-*Drafted on 2026-08-02*
+*Completed on 2026-08-02*
