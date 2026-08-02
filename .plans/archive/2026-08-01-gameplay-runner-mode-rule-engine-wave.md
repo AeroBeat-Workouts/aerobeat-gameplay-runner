@@ -1,9 +1,9 @@
 # Gameplay Runner And Mode Rule-Engine Wave
 
 **Date:** 2026-08-01  
-**Status:** Draft  
-**Last Updated:** 2026-08-01 22:17 EDT
-**Blocked Reason:** Contract ownership freeze proposal is ready and waiting for Derrick approval before the next freeze gate or implementation planning.  
+**Status:** Complete  
+**Last Updated:** 2026-08-01 22:32 EDT
+**Blocked Reason:** None
 **Agent:** pico
 
 ---
@@ -127,6 +127,20 @@ Only after runner `.testbed` passes:
 - 2026-08-01: Boxing punch input correction is approved as signal-with-no-args; v1 punch events do not carry `power`, `strength`, scalar intensity, or an explicit `active` boolean.
 - 2026-08-01: First fake input streams should be runner-owned test infrastructure. `aerobeat-input-core` remains contract-only for this seam.
 - 2026-08-01: BeatSaver regression fixtures will wait for Derrick-provided BeatSaver IDs from songs he already knows by feel from Shadowboxr and Hit Beat on Meta Quest.
+- 2026-08-01: Derrick approved the contract ownership freeze: `aerobeat-mode-core` owns portable mode contracts and mode-produced fragments; `aerobeat-gameplay-runner` owns full session envelopes, timeline/clock orchestration, aggregation, fake stream/testbed transport, and assembly-facing session facade.
+- 2026-08-01: Derrick provided the first BeatSaver regression candidate pool. Fast Sonic heavy metal/rock maps cover upper-end speed, K-Pop Demon Hunters and Game Grumps/NSP cover simpler reference songs, and Linkin Park covers mid-level challenge relative to Derrick's Expert play baseline.
+- 2026-08-01: Derrick approved continuing the current plan through the remaining freeze tickets. Input event shape and timing/fixture freeze proposals are approved for conversion into implementation beads.
+
+## BeatSaver Regression Candidate Pool
+
+These are full-run regression candidates Derrick knows by feel from Shadowboxr and Hit Beat on Meta Quest. Use these after tiny purpose-built fixtures prove contracts/rule engines locally.
+
+| Group | Feel / Difficulty Role | BeatSaver IDs |
+| --- | --- | --- |
+| Sonic Songs - Heavy Metal / Rock | Very fast upper-end speed references | `29be2`, `349f2`, `2b4e6`, `304ea` |
+| Kpop Demon Hunters - K-Pop | Simpler reference songs | `48727`, `48088`, `48792`, `47fb6` |
+| Game Grumps / NSP - Meme | Simpler/meme reference songs | `3d44b`, `472d3` |
+| Linkin Park - Rock Alternative | Mid-level challenge references for Derrick's Expert baseline | `226e`, `2f3d7`, `4858`, `19e5e` |
 
 ---
 
@@ -186,6 +200,165 @@ Freeze the v1 seam as a wrapper relationship:
 
 ---
 
+## Input Event Shape Freeze Proposal
+
+**Approval Status:** Approved by Derrick on 2026-08-01.
+
+### Boundary Rule
+
+Freeze v1 gameplay input as stable `aerobeat-input-core` signal contracts plus runner/test-owned fake event frames that mirror those signals exactly. Mode engines consume normalized input intent events; they do not consume camera frames, raw landmarks, detector debug dictionaries, product UI events, or provider-specific gesture state.
+
+### Boxing V1 Signal Contract
+
+`aerobeat-input-core/src/interfaces/boxing_input.gd` and the matching `InputManager` proxy signals should freeze to these exact no-arg punch and state signatures:
+
+```gdscript
+signal straight_left
+signal straight_right
+signal uppercut_left
+signal uppercut_right
+signal hook_left
+signal hook_right
+signal guard_enabled
+signal guard_disabled
+signal squat_enabled
+signal squat_disabled
+signal weave_left_enabled
+signal weave_left_disabled
+signal weave_right_enabled
+signal weave_right_disabled
+```
+
+Required correction from the current repo state:
+
+- Remove `power: float` from `straight_left`, `straight_right`, `uppercut_left`, `uppercut_right`, `hook_left`, and `hook_right` in `BoxingInput`.
+- Remove `power: float` from the matching `InputManager` proxy signals.
+- Change `InputManager._connect_boxing_signals()` punch proxy callbacks from one-arg forwarding to no-arg forwarding.
+- Do not add `active: bool`, `power`, `strength`, `intensity`, confidence, velocity, or detector score to these punch signals in v1.
+
+Boxing rule-engine meaning:
+
+- The six punch signals are instantaneous active intent events. The event itself means the punch became active for evaluation.
+- Guard, squat, and weave signals are state transitions, represented by explicit `_enabled` and `_disabled` events.
+- Boxing v1 evaluates authored Boxing targets against these signals and runner timestamps; any detector confidence/debug payload remains provider/testbed-local unless a later plan promotes it.
+- `BoxingInput` may continue extending `BodyCellInput`, but the Boxing v1 rule engine should primarily consume the explicit Boxing signals above.
+
+### Flow V1 Signal Contract
+
+Flow should primarily consume the shared calibrated `BodyCellInput` lane. Freeze these exact body-cell signatures as the main Flow v1 note input surface:
+
+```gdscript
+signal left_wrist_cell_entered(cell: int, direction: int)
+signal right_wrist_cell_entered(cell: int, direction: int)
+signal nose_cell_entered(cell: int, direction: int)
+signal calibration_session_updated(session: Dictionary)
+```
+
+`aerobeat-input-core/src/interfaces/flow_input.gd` may add only this Flow movement/state surface in v1:
+
+```gdscript
+signal squat_enabled
+signal squat_disabled
+```
+
+Flow rule-engine meaning:
+
+- `cell` is the direct calibrated 4x3 cell index `0..11` using the current BeatSaver row-major / athlete-space grid convention.
+- `direction` is the recent 8-way motion direction value when valid, or `-1` when ambiguous or unavailable.
+- `left_wrist_cell_entered` and `right_wrist_cell_entered` are the primary hit inputs for Flow `note`, `burst`, and `arc` evaluation.
+- `nose_cell_entered` is available for Flow obstacle/body-position semantics and calibration/test visualization where authored content needs it.
+- `calibration_session_updated(session: Dictionary)` remains calibration/HUD support, not a scoring event.
+- Do not introduce Flow-specific `slice_*`, `swing_*`, `trail_*`, `warn_*`, `reward_*`, or raw pose events into the v1 gameplay input contract.
+
+### Runner Fake-Input Envelope
+
+Runner-owned fake streams and fixture rows should wrap the signal contract without changing it. The minimum event dictionary for tests should be:
+
+```gdscript
+{
+	"contract": "aerobeat.input.boxing.v1" | "aerobeat.input.body_cell.v1" | "aerobeat.input.flow.v1",
+	"event": String,
+	"position_sec": float,
+	"args": Array
+}
+```
+
+Examples:
+
+```gdscript
+{"contract": "aerobeat.input.boxing.v1", "event": "straight_left", "position_sec": 12.40, "args": []}
+{"contract": "aerobeat.input.body_cell.v1", "event": "right_wrist_cell_entered", "position_sec": 12.40, "args": [6, 3]}
+{"contract": "aerobeat.input.flow.v1", "event": "squat_enabled", "position_sec": 12.40, "args": []}
+```
+
+Optional source/debug metadata may live beside this in testbed-only fixtures, but mode engines should not require it for v1 rule evaluation.
+
+---
+
+## Timing And Fixture Strategy Freeze Proposal
+
+**Approval Status:** Approved by Derrick on 2026-08-01.
+
+### Runner Clock Boundary
+
+Freeze `GameplayTimelineClock` as a runner-owned adapter interface over `aerobeat-tool-audio-player`. The audio player remains timing truth; runner samples a small clock surface and must not maintain a competing audio timeline.
+
+Exact v1 runner-consumed clock interface:
+
+```gdscript
+func reset() -> void
+func get_position_sec() -> float
+func get_duration_sec() -> float
+func get_state() -> String
+func is_complete() -> bool
+```
+
+The audio-player-backed adapter should implement those methods from the current `AeroAudioLoader` surface:
+
+- `reset()` delegates to `AeroAudioLoader.seek(0.0, audio_id)` or resets fake/test clock state.
+- `get_position_sec()` delegates to `AeroAudioLoader.get_position(audio_id)`.
+- `get_duration_sec()` delegates to `AeroAudioLoader.get_duration(audio_id)`.
+- `get_state()` delegates to `AeroAudioLoader.get_state(audio_id).get("state", "")`.
+- `is_complete()` returns true after `audio_playback_finished(audio_id)`, or when duration is known and sampled position is at/after duration.
+
+Runner implementation implications for the next wave:
+
+- Replace runner reliance on clock-owned `advance(delta_sec)` for real audio-backed runs with sampled `get_position_sec()`.
+- Keep any deterministic fake clock as runner test infrastructure only. It may expose helper methods for tests, but runner production code should consume only the five methods above.
+- Runner pause/resume/retry can command audio through a session/audio adapter later, but the timeline clock interface itself should stay read-focused except for `reset()`.
+- Do not move this clock interface into `aerobeat-mode-core`; modes receive timeline positions through `ModeTickFrame` and do not bind to audio directly.
+
+### Fixture Strategy
+
+Use tiny purpose-built fixtures first, then Derrick's BeatSaver regression candidate pool after local contracts and rule engines are stable.
+
+Fixture order:
+
+1. Mode-local tiny contract fixtures in `aerobeat-mode-boxing` and `aerobeat-mode-flow`: a few authored beats plus fake input rows that prove hit, miss, early, late, combo, and completion behavior.
+2. Runner tiny fixtures in `aerobeat-gameplay-runner/.testbed`: minimal song package/chart/set records from the `aerobeat-content-core` song-package model, a fake timeline clock, and fake input streams that prove lifecycle, dispatch order, pause/resume, terminal states, and result aggregation.
+3. Full-run BeatSaver-converted regression fixtures: use the Derrick-provided candidate pool below only after the tiny fixtures pass.
+
+Tiny fixture rules:
+
+- Keep fixtures small enough that failures identify one contract or rule issue.
+- Prefer direct checked-in dictionaries/resources for first rule tests; only use full song-package YAML when the content-resolution seam is under test.
+- Include at least one Boxing fixture for each no-arg punch family and state family.
+- Include at least one Flow fixture for left wrist, right wrist, direction-required note, directionless note, and nose/obstacle semantics if retained.
+- Use generated or silent local audio only where audio loading itself is under test; most runner tests should drive a fake clock and avoid media assets.
+
+BeatSaver regression pool:
+
+- Use the existing candidate table in this plan as the first realism pool.
+- Preserve group intent: Sonic IDs as fast upper-end speed references, K-Pop Demon Hunters and Game Grumps/NSP as simpler references, and Linkin Park as mid-level challenge references for Derrick's Expert baseline.
+- Do not choose replacement BeatSaver IDs until Derrick approves or revises the pool.
+- BeatSaver-derived full-run fixtures should validate through `aerobeat-content-core` song-package/chart contracts before they are used by runner or mode tests.
+
+### Approval Gate
+
+Implementation freeze details are approved. Create implementation Beads for input-core signal correction, mode-core tick/frame contracts, runner clock sampling, tiny fixtures, mode rule tests, runner `.testbed` composition, and BeatSaver regression conversion.
+
+---
+
 ## Tasks
 
 ### Task 1: Draft And Review High-Level Plan
@@ -202,9 +375,9 @@ Freeze the v1 seam as a wrapper relationship:
 **Files Created/Deleted/Modified:**
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.plans/2026-08-01-gameplay-runner-mode-rule-engine-wave.md`
 
-**Status:** ⏳ In Progress
+**Status:** ✅ Complete
 
-**Results:** Draft plan created for Derrick review. Derrick approved the high-level phase order, runner/mode-core envelope split, input-shape decision, fake-stream ownership, and BeatSaver fixture-source approach.
+**Results:** Draft plan created for Derrick review. Derrick approved the high-level phase order, runner/mode-core envelope split, input-shape decision, fake-stream ownership, and BeatSaver fixture-source approach. Bead closed after all freeze gates and implementation bead creation completed.
 
 ---
 
@@ -216,62 +389,76 @@ Freeze the v1 seam as a wrapper relationship:
 **References:** `REF-01`, `REF-03`, `REF-04`  
 **Prompt:** Claim bead `aerobeat-gameplay-runner-eni` at start. In the `research` role, inspect `aerobeat-gameplay-runner` and `aerobeat-mode-core` contract seams and propose exactly which v1 DTOs/interfaces live in each repo. Apply the approved boundary: `aerobeat-mode-core` owns portable mode contracts and mode-produced result fragments; `aerobeat-gameplay-runner` owns session-level envelopes, clock/timeline orchestration state, aggregation, and testbed transport. Do not implement code. Update this plan with the freeze proposal and leave the bead in progress for Derrick approval.
 
-**Status:** ⏳ In Progress
+**Status:** ✅ Complete
 
-**Results:** Research bead created and claimed. Contract ownership freeze proposal added above for Derrick review; bead intentionally remains in progress pending Derrick approval.
+**Results:** Research bead created and claimed. Contract ownership freeze proposal added above and approved by Derrick. Bead closed with reason: "Derrick approved the runner vs mode-core contract ownership freeze."
 
 ---
 
 ### Task 3: Freeze Input Event Shapes
 
-**Bead ID:** `Pending`  
+**Bead ID:** `aerobeat-gameplay-runner-8f8`
 **SubAgent:** `primary`  
 **Role:** `research`  
 **References:** `REF-01`, `REF-07`, `REF-08`  
-**Prompt:** After high-level approval, propose the exact v1 Boxing and Flow input event signatures, including the no-power punch correction. Do not implement; update this plan and wait for Derrick approval.
+**Prompt:** Claim bead `aerobeat-gameplay-runner-8f8` at start. In the `research` role, propose the exact v1 Boxing and Flow input event signatures, including Boxing no-arg punch signals and Flow `BodyCellInput` consumption. Do not implement; update this plan and wait for Derrick approval.
 
-**Status:** ⏳ Pending Approval
+**Status:** ✅ Complete
 
-**Results:** Pending.
+**Results:** Input Event Shape Freeze Proposal drafted above and approved by Derrick's continuation directive. Implementation bead `aerobeat-input-core-6xl` created for the input-core correction. No implementation performed.
 
 ---
 
 ### Task 4: Freeze Timing And Fixture Strategy
 
-**Bead ID:** `Pending`  
+**Bead ID:** `aerobeat-gameplay-runner-19q`
 **SubAgent:** `primary`  
 **Role:** `research`  
 **References:** `REF-01`, `REF-09`, `REF-10`  
-**Prompt:** After high-level approval, propose the narrow timeline clock contract and first fixture strategy for tiny unit fixtures plus BeatSaver-converted full-run fixtures. Do not implement; update this plan and wait for Derrick approval.
+**Prompt:** Claim bead `aerobeat-gameplay-runner-19q` at start. In the `research` role, propose the narrow timeline clock contract and first fixture strategy for tiny unit fixtures plus Derrick-provided BeatSaver-converted full-run fixtures. Use the BeatSaver regression candidate pool recorded in this plan. Do not implement; update this plan and wait for Derrick approval.
 
-**Status:** ⏳ Pending Approval
+**Status:** ✅ Complete
 
-**Results:** Pending.
+**Results:** Timing And Fixture Strategy Freeze Proposal drafted above and approved by Derrick's continuation directive. Implementation beads created for runner clock/testbed work and BeatSaver fixture conversion. No implementation performed.
 
 ---
 
 ### Task 5: Create Implementation Beads
 
-**Bead ID:** `Pending`  
+**Bead ID:** `aerobeat-gameplay-runner-o4d`
 **SubAgent:** `primary`  
 **Role:** `primary`  
 **References:** All approved freeze sections  
-**Prompt:** Only after all freeze gates are approved, create repo-local implementation Beads across runner, mode-core, input-core, mode-boxing, mode-flow, and any fixture/content repos. Link dependencies and update this plan. Do not start implementation until Derrick approves execution.
+**Prompt:** Claim bead `aerobeat-gameplay-runner-o4d` at start. Create repo-local implementation Beads across runner, mode-core, input-core, mode-boxing, mode-flow, and any fixture/content repos. Link dependencies and update this plan. Do not implement code.
 
-**Status:** ⏳ Pending Approval
+**Status:** ✅ Complete
 
-**Results:** Pending.
+**Results:** Implementation beads created; source implementation remains pending.
+
+| Repo | Bead ID | Slice | Dependency shape |
+| --- | --- | --- | --- |
+| `aerobeat-mode-core` | `afc-z8o` | Add portable mode contracts/DTOs/interfaces and tiny `ModeFixtureCase` contract fixtures. | Upstream foundation for runner adoption and Boxing/Flow engines. |
+| `aerobeat-input-core` | `aerobeat-input-core-6xl` | Correct Boxing punch signals and `InputManager` proxy callbacks to no-arg events; update focused tests/docs where available. | External blocker for runner fake input envelope fidelity and Boxing engine input consumption. |
+| `aerobeat-gameplay-runner` | `aerobeat-gameplay-runner-snf` | Adopt mode-core contracts, sampled `GameplayTimelineClock`, runner-owned fake input stream envelope, lifecycle/dispatch/aggregation tests. | Should wait on `afc-z8o` and `aerobeat-input-core-6xl`; cross-repo `bd dep add` could not resolve external repo IDs from runner's local database, so the blocker IDs are recorded in ticket notes/plan. |
+| `aerobeat-mode-boxing` | `aerobeat-mode-boxing-hz4` | Implement pure Boxing rule engine over no-arg Boxing input events with tiny fixtures/tests. | Should wait on `afc-z8o` and `aerobeat-input-core-6xl`; cross-repo dependencies could not be stored in the local Boxing database. |
+| `aerobeat-mode-flow` | `aerobeat-mode-flow-346` | Implement pure Flow rule engine over `BodyCellInput` events with tiny fixtures/tests. | Should wait on `afc-z8o`; cross-repo dependency could not be stored in the local Flow database. |
+| `aerobeat-content-core` | `aerobeat-content-core-xba` | Convert Derrick's BeatSaver candidate pool into content-core song-package/chart regression fixtures. | Owns content/fixture conversion because the freeze requires BeatSaver-derived fixtures to validate through content-core contracts before runner or mode tests. |
+| `aerobeat-gameplay-runner` | `aerobeat-gameplay-runner-yij` | Compose `.testbed` full-run regressions with runner, mode-core, content-core, input-core, Boxing, and Flow. | Local dependency added: `aerobeat-gameplay-runner-yij` depends on `aerobeat-gameplay-runner-snf`. It should also wait on `aerobeat-mode-boxing-hz4`, `aerobeat-mode-flow-346`, and `aerobeat-content-core-xba`; those external blockers are recorded in ticket notes/plan because local `bd dep add` cannot resolve IDs from other repo databases. |
 
 ---
 
 ## Final Results
 
-**Status:** Draft
+**Status:** ✅ Complete
 
-**What We Built:** Draft plan only; no implementation.
+**What We Built:** Completed the architecture-freeze and implementation-bead planning wave. The plan records approved ownership, input, timing, fake-stream, and BeatSaver fixture decisions, plus repo-local implementation beads for the next coding wave. No source implementation was performed.
 
-**Reference Check:** Initial references inspected. Current mismatch recorded: Boxing input signals still carry `power: float` in input-core while the frozen architecture says no power/strength/intensity concept in v1.
+**Reference Check:** `REF-01` architecture freeze carried forward. `REF-07` and `REF-08` mismatch recorded and converted to `aerobeat-input-core-6xl`: Boxing input signals still carry `power: float` in input-core while the frozen architecture says no power/strength/intensity concept in v1. `REF-10` audio-player surface checked for sampled clock methods.
 
 **Commits:** Pending.
 
-**Lessons Learned:** Pending.
+**Lessons Learned:** Cross-repo Beads dependencies could not be stored directly from each local repo database, so the dependency shape is recorded in bead notes and this plan. Local runner dependency was stored for `aerobeat-gameplay-runner-yij` depending on `aerobeat-gameplay-runner-snf`.
+
+**Beads Sync Caveat:** `aerobeat-gameplay-runner` Beads pushed successfully. Adjacent repo implementation beads exist locally but their Beads remotes need repair before they can sync: mode-core has no remote configured (`afc-r7s`), and input-core (`aerobeat-input-core-9r2`), mode-boxing (`aerobeat-mode-boxing-0ui`), mode-flow (`aerobeat-mode-flow-bsb`), and content-core (`aerobeat-content-core-gyn`) report Dolt `no common ancestor`. Do not force-push; preserve the local implementation beads and remote state.
+
+*Completed on 2026-08-01*
