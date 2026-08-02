@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-01  
 **Status:** Draft  
-**Last Updated:** 2026-08-01 22:10 EDT
-**Blocked Reason:** High-level phase order and runner/mode-core envelope split approved; contract ownership freeze proposal in progress before implementation.  
+**Last Updated:** 2026-08-01 22:17 EDT
+**Blocked Reason:** Contract ownership freeze proposal is ready and waiting for Derrick approval before the next freeze gate or implementation planning.  
 **Agent:** pico
 
 ---
@@ -218,7 +218,7 @@ Freeze the v1 seam as a wrapper relationship:
 
 **Status:** ⏳ In Progress
 
-**Results:** Research bead created and claimed. Contract ownership freeze proposal added above for Derrick review; bead intentionally remains in progress pending approval.
+**Results:** Research bead created and claimed. Contract ownership freeze proposal added above for Derrick review; bead intentionally remains in progress pending Derrick approval.
 
 ---
 
