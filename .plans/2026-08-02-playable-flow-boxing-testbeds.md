@@ -1,9 +1,9 @@
 # Playable Flow and Boxing Gameplay Testbeds
 
 **Date:** 2026-08-02  
-**Status:** Draft  
-**Last Updated:** 2026-08-02 14:48 EDT
-**Blocked Reason:** Pending Derrick freeze/approval before implementation  
+**Status:** Blocked  
+**Last Updated:** 2026-08-02 17:22 EDT
+**Blocked Reason:** Pending Derrick freeze/approval of readiness-audit blockers before implementation beads  
 **Agent:** pico
 
 ---
@@ -173,6 +173,17 @@ Spatial behavior must be grid-driven. The play area is defined by translating th
 4. Are the candidate freezes acceptable: parent `PlayerRig` movement with fixed child `Camera3D`, and `approach_time_sec` travel timing with `spawn_distance_m` relative to the hit plane?
 5. What minimum manual/Godot runtime verification must pass before QA and audit: fresh scene open, camera feed live or explicit replay fallback, calibration pass, song load, environment load for `image`, `video`, `glb`, and `splat` supported paths, gameplay start, hit/miss feedback, pause/recalibrate/auto-resume, completion summary, and clean editor/runtime logs?
 
+### Readiness Audit Blockers
+
+Task 2 readiness audit returned `BLOCKED`; do not create implementation beads until these decisions are frozen:
+
+- Freeze the input-core body-grid pose v1 decisions still listed as open in `REF-12`: one dictionary frame signal, required `raw_x/raw_y` plus clamped `x/y`, schema-shaped invalid pose, root/per-anchor validity semantics, tracking-loss invalid emission, active-provider-only `InputManager` proxy, and stable `calibration_id` behavior.
+- Freeze runner overlay fade semantics: fade starts only on `calibration_id` change / calibration success, `0 = no post-calibration persistence`, and always-visible behavior is controlled only by a debug toggle.
+- Freeze exact world-space mapper formulas, including Godot `Y` sign. Row `0` / top must map to visually upper cells in first-person view.
+- Decide whether current environment-loader splat behavior is acceptable for this slice. Repo inspection shows splat loads as a placeholder `Node3D` / anchor with point estimate, not an actually rendered splat background.
+- Freeze pause/recalibration audio behavior: audio playback and gameplay ticking pause together, successful recalibration resumes both, and timing windows derive only from the audio clock position.
+- Freeze minimum manual validation gate scope, especially whether image/video/GLB/splat all must visibly render or whether splat placeholder acceptance is enough.
+
 ---
 
 ## Tasks
@@ -219,11 +230,11 @@ Spatial behavior must be grid-driven. The play area is defined by translating th
 
 ### Task 2: Freeze Build Plan After Review
 
-**Bead ID:** `Pending`  
+**Bead ID:** `aerobeat-gameplay-runner-7l8`  
 **SubAgent:** `primary` (for `research` / `auditor` workflow roles)  
-**Role:** `research`  
+**Role:** `auditor`  
 **References:** `REF-01` through `REF-11`
-**Prompt:** After Task 1 review, update this plan with the frozen implementation decisions and create executable task slices for developer testbed implementation, QA, and audit. Do not begin implementation until Derrick confirms the plan is ready to execute.
+**Prompt:** Claim bead `aerobeat-gameplay-runner-7l8` on start. Review this plan and `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/.plans/2026-08-02-normalized-body-grid-pose-contract.md` for missing holes, unanswered questions, inconsistent repo boundaries, and readiness to break the work into executable implementation seams. Do not implement code. If no blocking questions remain, propose concrete implementation seams with repo ownership, bead ordering, coder/QA/auditor loop boundaries, and validation gates. Close bead `aerobeat-gameplay-runner-7l8` only if the review is complete and clearly states whether implementation can begin.
 
 **Folders Created/Deleted/Modified:**
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.plans/`
@@ -231,19 +242,19 @@ Spatial behavior must be grid-driven. The play area is defined by translating th
 **Files Created/Deleted/Modified:**
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.plans/2026-08-02-playable-flow-boxing-testbeds.md`
 
-**Status:** ⏳ Pending
+**Status:** ⏳ In Progress
 
-**Results:** Pending Derrick review and freeze/approval of the contract and playable-testbed questions above.
+**Results:** Readiness audit completed and returned `BLOCKED`. The audit found repo ownership boundaries mostly clean but identified freeze blockers around input-core body-grid pose v1 API decisions, runner overlay fade semantics, exact first-person world mapper formulas and Godot `Y` sign, splat environment expectations, pause/recalibration audio behavior, and the minimum manual validation gate. Implementation beads should not be created until Derrick resolves those items. Bead `aerobeat-gameplay-runner-7l8` remains open/in-progress with blocker notes.
 
 ---
 
 ## Final Results
 
-**Status:** ⚠️ Partial
+**Status:** ❌ Blocked
 
 **What We Built:** Draft plan plus independent review pass only. No implementation started.
 
-**Reference Check:** Subagent reviews completed against referenced repos and raised freeze edits/open questions now captured in this plan and `REF-12`.
+**Reference Check:** Subagent reviews completed against referenced repos and raised freeze edits/open questions now captured in this plan and `REF-12`. The latest readiness audit specifically blocked implementation until the decisions in `Readiness Audit Blockers` are frozen.
 
 **Commits:**
 - Pending.
