@@ -1,9 +1,9 @@
 # Playable Flow and Boxing Gameplay Testbeds
 
 **Date:** 2026-08-02  
-**Status:** Blocked  
-**Last Updated:** 2026-08-02 20:16 EDT
-**Blocked Reason:** Final manual/high-fidelity audit is blocked by playable scene camera/replay provider startup and unproven environment splat display. Runner camera-source selection is now active follow-up work in Task 4.
+**Status:** In Progress  
+**Last Updated:** 2026-08-02 20:28 EDT
+**Blocked Reason:** None for the runner camera-source selection seam; Task 4 closed `aerobeat-gameplay-runner-o9t` at commit `987d1bd`. Final completion still depends on QA/audit rerunning the manual/high-fidelity gate and on the environment-owned splat-display follow-up `aerobeat-tool-environment-1ds`.
 **Agent:** pico
 
 ---
@@ -371,11 +371,31 @@ Before QA and audit can pass, the coder/QA evidence must include:
 
 ---
 
+### Task 5: QA Retry After Camera Source Selection
+
+**Bead ID:** `aerobeat-gameplay-runner-an1`
+**SubAgent:** `primary` (for `qa` workflow role)
+**Role:** `qa`
+**References:** `REF-01` through `REF-12`
+**Prompt:** Claim bead `aerobeat-gameplay-runner-an1` on start. At commit `987d1bd`, perform the QA retry for the playable Flow and Boxing testbeds after Task 4 removed the stale provider-startup blocker. Verify that camera source selection happens during setup/calibration before provider startup; live camera and replay video modes are exposed; replay uses a local `FileDialog` path and passes that path into camera-tracking provider settings before registration. Rerun GodotEnv sync, headless import, full GUT, fresh headless Flow and Boxing scene opens, fresh non-headless Flow and Boxing scene opens with log inspection, class-name scan, and `git diff --check`. Exercise or truthfully classify the remaining manual/high-fidelity gates from this plan, including song/environment FileDialog selection, replay/live camera feed availability, T-pose calibration, overlay fade, audio/gameplay sync, hit SFX, misses, recalibration pause/resume, completion summary, and cells `0/3/8/11` first-person placement. Do not close the bead; leave notes and a QA pass/blocker decision for final audit.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/`
+
+**Files Created/Deleted/Modified:**
+- Pending QA notes.
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
 ## Final Results
 
-**Status:** ❌ Blocked
+**Status:** ⚠️ Partial / In Progress
 
-**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is committed and pushed, coder follow-up fixes for the static QA blockers are committed and pushed, and the static/headless QA retry passed. Final manual/high-fidelity audit is blocked on runner camera/replay startup (`aerobeat-gameplay-runner-o9t`) and environment-loader splat display ownership (`aerobeat-tool-environment-1ds`).
+**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is committed and pushed, coder follow-up fixes for the static QA blockers are committed and pushed, and the static/headless QA retry passed. The stale runner camera/replay startup blocker was addressed by Task 4 in commit `987d1bd`; QA now needs to rerun the manual/high-fidelity gate. Environment-loader splat display remains tracked as environment-owned follow-up `aerobeat-tool-environment-1ds`.
 
 **Reference Check:** Subagent reviews completed against referenced repos. The final readiness audit passed after freeze edits and closed `aerobeat-gameplay-runner-7l8`.
 
@@ -386,8 +406,9 @@ Before QA and audit can pass, the coder/QA evidence must include:
 - `e362153` - Fix playable testbed QA blockers
 - `5abcd88` - Record playable testbed QA retry
 - `04e300b` - Record playable testbed QA retry in plan
+- `987d1bd` - Add playable camera source selection
 
-**Lessons Learned:** Static/headless coverage can prove the target mapping and overlay toggle regressions, but the playable seam still needs an explicit live/replay provider configuration path before manual runtime validation can prove calibration and gameplay behavior.
+**Lessons Learned:** Static/headless coverage can prove the target mapping and overlay toggle regressions. Manual runtime validation needs source selection before provider startup and should separate runner-owned camera/replay flow from environment-owned display gaps.
 
 ---
 
