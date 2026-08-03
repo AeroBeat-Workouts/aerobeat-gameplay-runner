@@ -7,6 +7,7 @@ const InputStream := preload("res://scripts/input_manager_stream.gd")
 const ContentLoader := preload("res://scripts/playable_content_loader.gd")
 const EnvironmentAdapter := preload("res://scripts/environment_loader_adapter.gd")
 const TargetRegions := preload("res://scripts/playable_target_regions.gd")
+const CameraSourcePickerState := preload("res://scripts/camera_source_picker_state.gd")
 const GameplayRunConfig := preload("res://addons/aerobeat-gameplay-runner/src/data_types/gameplay_run_config.gd")
 const GameplayRunState := preload("res://addons/aerobeat-gameplay-runner/src/data_types/gameplay_run_state.gd")
 const GameplaySession := preload("res://addons/aerobeat-gameplay-runner/src/runtime/gameplay_session.gd")
@@ -26,6 +27,8 @@ var _session: RefCounted = null
 var _clock: RefCounted = null
 var _input_stream: RefCounted = null
 var _input_manager: Node = null
+var _camera_source: RefCounted = null
+var _camera_provider_registered := false
 var _audio_loader: Node = null
 var _environment_adapter: Node = null
 var _loaded_content := {}
@@ -45,13 +48,16 @@ var _overlay_visible_until_ms := 0
 @onready var _environment_world: Node3D = %EnvironmentWorld
 @onready var _hud: Label = %HudLabel
 @onready var _summary: Label = %SummaryLabel
+@onready var _camera_source_label: Label = %CameraSourceLabel
 @onready var _song_dialog: FileDialog = %SongDialog
 @onready var _environment_dialog: FileDialog = %EnvironmentDialog
+@onready var _replay_video_dialog: FileDialog = %ReplayVideoDialog
 
 func _ready() -> void:
 	_config = ConfigLoader.new().load_config()
 	_mapper = PlayfieldMapperScript.new(_config)
 	_target_regions = TargetRegions.new(_mapper.columns, _mapper.rows)
+	_camera_source = CameraSourcePickerState.new()
 	_camera.transform = _mapper.get_camera_start_transform()
 	_audio_loader = AeroAudioLoaderScript.new()
 	_audio_loader.name = "AeroAudioLoader"
@@ -62,7 +68,8 @@ func _ready() -> void:
 	_setup_environment()
 	_build_grid()
 	_setup_dialogs()
-	_update_hud("Choose song package and environment, then T-pose to calibrate.")
+	_update_camera_source_label()
+	_update_hud("Choose camera source, song package, and environment, then T-pose to calibrate.")
 
 func _process(delta: float) -> void:
 	var now := Time.get_ticks_msec()
@@ -83,12 +90,9 @@ func _setup_input() -> void:
 	_input_manager.name = "InputManager"
 	add_child(_input_manager)
 	if DisplayServer.get_name() == "headless":
-		_update_hud("Headless run: live camera provider registration skipped; use the editor for live input proof.")
+		_update_hud("Headless run: camera provider registration waits for an editor/runtime source selection.")
+		_input_stream.bind(_input_manager, _clock)
 		return
-	var provider := CameraTrackingInputProviderScript.new()
-	provider.name = "CameraTrackingInputProvider"
-	if not _input_manager.register_provider(provider, {}):
-		_update_hud("Camera input provider unavailable in this run; scene remains open for package/environment setup.")
 	_input_stream.bind(_input_manager, _clock)
 	_input_manager.body_grid_calibration_started.connect(_on_calibration_started)
 	_input_manager.body_grid_calibration_succeeded.connect(_on_calibration_succeeded)
@@ -116,6 +120,14 @@ func _setup_dialogs() -> void:
 	_environment_dialog.file_selected.connect(func(path: String) -> void:
 		_environment_adapter.load_environment_file(path)
 	)
+	_replay_video_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
+	_replay_video_dialog.access = FileDialog.ACCESS_FILESYSTEM
+	_replay_video_dialog.filters = PackedStringArray(["*.mp4,*.mov,*.mkv,*.webm,*.ogv,*.avi ; Replay video files"])
+	_replay_video_dialog.file_selected.connect(func(path: String) -> void:
+		_select_replay_video_source(path)
+	)
+	%LiveCameraButton.pressed.connect(func() -> void: _select_live_camera_source())
+	%ReplayVideoButton.pressed.connect(func() -> void: _replay_video_dialog.popup_centered_ratio(0.75))
 	%PickSongButton.pressed.connect(func() -> void: _song_dialog.popup_centered_ratio(0.75))
 	%PickEnvironmentButton.pressed.connect(func() -> void: _environment_dialog.popup_centered_ratio(0.75))
 	%CalibrateButton.pressed.connect(_request_calibration)
@@ -136,6 +148,8 @@ func _load_song(path: String) -> void:
 func _request_calibration() -> void:
 	if _session != null and _session.get_state() == GameplayRunState.RUNNING:
 		_pause_for_recalibration()
+	if not _ensure_input_provider_registered():
+		return
 	if _input_manager != null and _input_manager.has_method("start_calibration"):
 		if not _input_manager.start_calibration():
 			_update_hud("Calibration request unavailable; camera provider may not be ready.")
@@ -196,6 +210,51 @@ func _finish_session() -> void:
 	_audio_loader.stop(String(_config.get("audio", {}).get("music_slot", "default")))
 	_summary.text = "Complete  Hits: %d  Misses: %d  Score: %d" % [summary.get("hits", 0), summary.get("misses", 0), summary.get("score", 0)]
 	_update_hud("Complete.")
+
+func _select_live_camera_source(camera_id: String = "0") -> void:
+	if _camera_source == null:
+		return
+	_camera_source.select_live(camera_id)
+	_reset_camera_provider_registration()
+	_update_camera_source_label()
+	_update_hud("Live camera selected. T-pose will register camera tracking before calibration.")
+
+func _select_replay_video_source(path: String) -> void:
+	if _camera_source == null:
+		return
+	_camera_source.select_replay(path)
+	_reset_camera_provider_registration()
+	_update_camera_source_label()
+	_update_hud("Replay video selected. T-pose will pass the local path into camera tracking before calibration.")
+
+func _reset_camera_provider_registration() -> void:
+	if _camera_provider_registered and _input_manager != null and _input_manager.has_method("unregister_provider"):
+		_input_manager.unregister_provider("camera_tracking")
+	_camera_provider_registered = false
+
+func _ensure_input_provider_registered() -> bool:
+	if _input_manager == null:
+		_update_hud("Input manager unavailable.")
+		return false
+	if _camera_source == null or not _camera_source.is_configured():
+		_update_hud("Choose a live camera or replay video before calibration.")
+		return false
+	if DisplayServer.get_name() == "headless":
+		_update_hud("Headless run: camera provider registration skipped; open the scene in the editor/runtime for camera calibration.")
+		return false
+	if _camera_provider_registered:
+		return true
+	var settings: Dictionary = _camera_source.provider_settings()
+	var provider := CameraTrackingInputProviderScript.new()
+	provider.name = "CameraTrackingInputProvider"
+	if provider.has_method("set_selected_camera_device_id"):
+		provider.set_selected_camera_device_id(String(settings.get("camera_source", "")))
+	if not _input_manager.register_provider(provider, settings):
+		_update_hud("Camera input provider unavailable for %s." % _camera_source.status_text())
+		return false
+	_camera_provider_registered = true
+	_update_hud("Camera input provider registered with %s." % _camera_source.status_text())
+	return true
 
 func _mode_chart_data() -> Dictionary:
 	if mode_id == "boxing":
@@ -316,12 +375,18 @@ func _load_hit_sfx() -> void:
 
 func _update_hud(message: String) -> void:
 	var summary := _mapper.debug_snapshot() if _mapper != null else {}
-	_hud.text = "%s\nMode: %s  Clock: %.3fs  Scale: %s\nCells: 0 UL, 3 UR, 8 LL, 11 LR" % [
+	var camera_text: String = _camera_source.status_text() if _camera_source != null else "Camera source: unavailable"
+	_hud.text = "%s\n%s\nMode: %s  Clock: %.3fs  Scale: %s\nCells: 0 UL, 3 UR, 8 LL, 11 LR" % [
 		message,
+		camera_text,
 		mode_id,
 		float(_clock.get_position_sec()) if _clock != null else 0.0,
 		summary.get("scale_mode", ""),
 	]
+
+func _update_camera_source_label() -> void:
+	if _camera_source_label != null and _camera_source != null:
+		_camera_source_label.text = _camera_source.status_text()
 
 func _as_dict(value: Variant) -> Dictionary:
 	return value if value is Dictionary else {}

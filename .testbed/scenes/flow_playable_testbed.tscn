@@ -47,6 +47,14 @@ offset_bottom = 708.0
 
 [node name="Toolbar" type="HBoxContainer" parent="UI/Panel/VBox"]
 
+[node name="LiveCameraButton" type="Button" parent="UI/Panel/VBox/Toolbar"]
+unique_name_in_owner = true
+text = "Live Camera"
+
+[node name="ReplayVideoButton" type="Button" parent="UI/Panel/VBox/Toolbar"]
+unique_name_in_owner = true
+text = "Replay Video"
+
 [node name="PickSongButton" type="Button" parent="UI/Panel/VBox/Toolbar"]
 unique_name_in_owner = true
 text = "Song"
@@ -63,6 +71,10 @@ text = "T-Pose"
 unique_name_in_owner = true
 text = "Flow playable testbed"
 
+[node name="CameraSourceLabel" type="Label" parent="UI/Panel/VBox"]
+unique_name_in_owner = true
+text = "Camera source: choose live or replay video"
+
 [node name="SummaryLabel" type="Label" parent="UI/Panel/VBox"]
 unique_name_in_owner = true
 
@@ -74,4 +86,7 @@ custom_minimum_size = Vector2(320, 180)
 unique_name_in_owner = true
 
 [node name="EnvironmentDialog" type="FileDialog" parent="UI"]
+unique_name_in_owner = true
+
+[node name="ReplayVideoDialog" type="FileDialog" parent="UI"]
 unique_name_in_owner = true

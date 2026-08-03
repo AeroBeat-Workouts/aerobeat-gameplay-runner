@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-02  
 **Status:** Blocked  
-**Last Updated:** 2026-08-02 20:07 EDT
-**Blocked Reason:** Final manual/high-fidelity audit is blocked by playable scene camera/replay provider startup and unproven environment splat display.  
+**Last Updated:** 2026-08-02 20:16 EDT
+**Blocked Reason:** Final manual/high-fidelity audit is blocked by playable scene camera/replay provider startup and unproven environment splat display. Runner camera-source selection is now active follow-up work in Task 4.
 **Agent:** pico
 
 ---
@@ -244,7 +244,10 @@ Before QA and audit can pass, the coder/QA evidence must include:
 
 - Fresh open of Boxing playable scene in Godot and clean editor/runtime logs.
 - Fresh open of Flow playable scene in Godot and clean editor/runtime logs.
-- Camera feed live, or an explicit recorded/replay fallback documented in the bead.
+- Camera source selection happens during the calibration/setup step before gameplay starts, before `InputManager` provider startup is probed.
+- Camera source selection supports live camera input and replay video input.
+- Replay video input can be selected from a local filesystem path through a runner testbed `FileDialog`/file-browser path lookup, and that selected path is passed into the camera-tracking provider before registration/startup.
+- Camera feed live, or an explicit recorded/replay fallback selected through the testbed UI and documented in the bead.
 - Song package selected from disk and validated through content-core.
 - Environment selected from disk and displayed through environment-loader/core for each supported kind in scope: image, video, GLB, and splat. If a supported kind fails to display, file/update an environment-owned bead or blocker rather than accepting runner-local placeholder rendering.
 - T-pose calibration succeeds before playback.
@@ -339,6 +342,32 @@ Before QA and audit can pass, the coder/QA evidence must include:
 **Status:** ⏳ In Progress
 
 **Results:** Execution beads created. Cross-repo dependencies could not be represented with local `bd dep add`, so dependency order is recorded in bead notes and enforced by orchestration. The input-core contract seam passed QA/audit and closed `aerobeat-input-core-ij5`; the camera-tracking body-grid anchor seam passed implementation/QA/audit and closed `oc-zex8`. Runner implementation landed in commit `c1bb79a` with playable Flow and Boxing `.testbed` scenes, runner-owned `assets/playable_testbed.yaml`, `PlayfieldMapper`, shared playable harness/adapters, FileDialog song/environment selection, dummy hit SFX, generated mesh/debug visuals, and GodotEnv dependencies wired into the testbed. Coder validation passed targeted GUT (`11` tests, `174` assertions), fresh headless Flow and Boxing scene opens, GodotEnv sync, and class-name collision scan. QA returned `BLOCKED`: debug overlay YAML toggles were not individually honored, Flow burst/arc multi-placement visualization only rendered one cell, and Boxing transition/blocked-region visualization mapped spans/bands to single cells. Coder follow-up commit `e362153` fixed those static QA blockers by adding `playable_target_regions.gd`, rendering one visual per required authored/semantic cell or region, honoring the independent debug overlay toggles, and adding focused GUT coverage. Coder validation after the fix passed GodotEnv sync, headless import, GUT (`16` tests, `190` assertions), fresh headless Flow and Boxing scene opens, class-name scan, and `git diff --check`. QA retry passed the static/headless scope at commit `5abcd88`: GodotEnv sync, headless import, full GUT (`16` tests, `190` assertions), fresh headless Flow and Boxing scene opens, class-name scan, and `git diff --check` all passed, with the three prior static blockers confirmed fixed in code and tests. Final manual/high-fidelity audit at commit `04e300b` returned `BLOCKED`: fresh non-headless Flow and Boxing runtime opens exit `0` but logs are not clean because `InputManager` reports `Provider 'camera_tracking' failed startup test`; the playable scenes do not expose a scene/UI/settings path to choose replay before provider startup, so live/replay camera, T-pose calibration, overlay fade, audio/gameplay sync, hit SFX, miss tracking, recalibration pause/resume, completion summary, FileDialog selection/display, and first-person runtime cell placement remain unproven. Follow-up runner bead `aerobeat-gameplay-runner-o9t` was created and linked as a dependency of `aerobeat-gameplay-runner-an1`. Environment-loader follow-up bead `aerobeat-tool-environment-1ds` was created for visible splat rendering beyond the current placeholder/anchor path.
+
+---
+
+### Task 4: Pre-Gameplay Camera Source Selection
+
+**Bead ID:** `aerobeat-gameplay-runner-o9t`
+**SubAgent:** `primary` (for `coder` / `qa` / `auditor` workflow roles)
+**Role:** `coder`
+**References:** `REF-01`, `REF-02`, `REF-03`, `REF-04`, `REF-08`, `REF-11`
+**Prompt:** Claim bead `aerobeat-gameplay-runner-o9t` on start. Implement runner-owned camera source selection for the Flow and Boxing playable testbed scenes. The testbed must let the developer choose the camera source during setup/calibration before gameplay starts and before `InputManager` probes/registers the camera-tracking provider. It must support live camera and replay video modes. Replay mode must include a local filesystem `FileDialog`/file-browser path lookup for a video file and pass that selected local path into the camera-tracking provider settings before startup. Reuse the existing camera-tracking provider contracts and proving-scene patterns; do not modify generated `addons/` copies directly. Add focused GUT or script-level coverage for the provider settings/picker state where feasible, run GodotEnv sync, headless import, targeted/full GUT, fresh Flow and Boxing scene opens, class-name scan, and `git diff --check`. Because this touches Godot runtime scenes, also perform fresh non-headless Flow and Boxing opens and inspect editor/runtime logs; unexpected warnings/errors must be fixed or explicitly recorded as accepted exceptions. Commit and push on completion, leaving bead notes with changed files and validation output. Do not close `aerobeat-gameplay-runner-an1`; that remains for QA/audit after this blocker.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed/`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.plans/`
+
+**Files Created/Deleted/Modified:**
+- `.testbed/scripts/camera_source_picker_state.gd` - added runner-owned live/replay picker state and provider settings shaping.
+- `.testbed/scripts/playable_testbed_harness.gd` - deferred camera-tracking provider registration until the developer chooses live camera or replay video before calibration; passes selected settings/path into `InputManager.register_provider`.
+- `.testbed/scenes/flow_playable_testbed.tscn` - added live camera/replay video controls, source status label, and replay `FileDialog`.
+- `.testbed/scenes/boxing_playable_testbed.tscn` - added the same camera source controls and replay `FileDialog`.
+- `.testbed/tests/test_camera_source_picker_state.gd` - added focused GUT coverage for live/replay provider settings and empty replay state.
+- `.plans/2026-08-02-playable-flow-boxing-testbeds.md` - recorded Task 4 implementation and validation results.
+
+**Status:** ✅ Implemented
+
+**Results:** Implemented runner-owned camera source selection in the shared Flow/Boxing playable harness. Provider registration is no longer attempted in `_ready()`; calibration now requires the developer to choose `Live Camera` or `Replay Video` first. Replay mode opens a local filesystem `FileDialog` and stores the selected path in provider settings as `camera_source`, `selected_camera_device_id`, and `source: {kind: "video_file", path: ...}` before `InputManager.register_provider` performs its startup probe. Live mode stores `source: {kind: "live_camera", camera_id/id: ...}`. Switching source before calibration unregisters the prior camera provider registration so the next calibration uses the newly selected settings. Validation passed: GodotEnv sync, headless import, full GUT (`19` tests, `202` assertions), fresh headless Flow and Boxing scene opens, fresh non-headless Flow and Boxing scene opens with clean runtime output, class-name scan, and `git diff --check`. Accepted exception: headless import still reports existing third-party GUT invalid UID fallback warnings and an ObjectDB leak warning on editor-import exit; the fresh scene opens and GUT run are clean.
 
 ---
 
