@@ -1,9 +1,9 @@
 # Playable Flow and Boxing Gameplay Testbeds
 
 **Date:** 2026-08-02  
-**Status:** In Progress  
-**Last Updated:** 2026-08-02 19:59 EDT
-**Blocked Reason:** None  
+**Status:** Blocked  
+**Last Updated:** 2026-08-02 20:07 EDT
+**Blocked Reason:** Final manual/high-fidelity audit is blocked by playable scene camera/replay provider startup and unproven environment splat display.  
 **Agent:** pico
 
 ---
@@ -338,15 +338,15 @@ Before QA and audit can pass, the coder/QA evidence must include:
 
 **Status:** ⏳ In Progress
 
-**Results:** Execution beads created. Cross-repo dependencies could not be represented with local `bd dep add`, so dependency order is recorded in bead notes and enforced by orchestration. The input-core contract seam passed QA/audit and closed `aerobeat-input-core-ij5`; the camera-tracking body-grid anchor seam passed implementation/QA/audit and closed `oc-zex8`. Runner implementation landed in commit `c1bb79a` with playable Flow and Boxing `.testbed` scenes, runner-owned `assets/playable_testbed.yaml`, `PlayfieldMapper`, shared playable harness/adapters, FileDialog song/environment selection, dummy hit SFX, generated mesh/debug visuals, and GodotEnv dependencies wired into the testbed. Coder validation passed targeted GUT (`11` tests, `174` assertions), fresh headless Flow and Boxing scene opens, GodotEnv sync, and class-name collision scan. QA returned `BLOCKED`: debug overlay YAML toggles were not individually honored, Flow burst/arc multi-placement visualization only rendered one cell, and Boxing transition/blocked-region visualization mapped spans/bands to single cells. Coder follow-up commit `e362153` fixed those static QA blockers by adding `playable_target_regions.gd`, rendering one visual per required authored/semantic cell or region, honoring the independent debug overlay toggles, and adding focused GUT coverage. Coder validation after the fix passed GodotEnv sync, headless import, GUT (`16` tests, `190` assertions), fresh headless Flow and Boxing scene opens, class-name scan, and `git diff --check`. QA retry passed the static/headless scope at commit `5abcd88`: GodotEnv sync, headless import, full GUT (`16` tests, `190` assertions), fresh headless Flow and Boxing scene opens, class-name scan, and `git diff --check` all passed, with the three prior static blockers confirmed fixed in code and tests. The bead remains open/in_progress for final manual/high-fidelity audit because live camera/T-pose behavior, GUI FileDialog song/environment selection, supported environment display proof, hit gesture/SFX proof, recalibration pause/resume, completion summary behavior, and live overlay/fade observation remain unproven headlessly.
+**Results:** Execution beads created. Cross-repo dependencies could not be represented with local `bd dep add`, so dependency order is recorded in bead notes and enforced by orchestration. The input-core contract seam passed QA/audit and closed `aerobeat-input-core-ij5`; the camera-tracking body-grid anchor seam passed implementation/QA/audit and closed `oc-zex8`. Runner implementation landed in commit `c1bb79a` with playable Flow and Boxing `.testbed` scenes, runner-owned `assets/playable_testbed.yaml`, `PlayfieldMapper`, shared playable harness/adapters, FileDialog song/environment selection, dummy hit SFX, generated mesh/debug visuals, and GodotEnv dependencies wired into the testbed. Coder validation passed targeted GUT (`11` tests, `174` assertions), fresh headless Flow and Boxing scene opens, GodotEnv sync, and class-name collision scan. QA returned `BLOCKED`: debug overlay YAML toggles were not individually honored, Flow burst/arc multi-placement visualization only rendered one cell, and Boxing transition/blocked-region visualization mapped spans/bands to single cells. Coder follow-up commit `e362153` fixed those static QA blockers by adding `playable_target_regions.gd`, rendering one visual per required authored/semantic cell or region, honoring the independent debug overlay toggles, and adding focused GUT coverage. Coder validation after the fix passed GodotEnv sync, headless import, GUT (`16` tests, `190` assertions), fresh headless Flow and Boxing scene opens, class-name scan, and `git diff --check`. QA retry passed the static/headless scope at commit `5abcd88`: GodotEnv sync, headless import, full GUT (`16` tests, `190` assertions), fresh headless Flow and Boxing scene opens, class-name scan, and `git diff --check` all passed, with the three prior static blockers confirmed fixed in code and tests. Final manual/high-fidelity audit at commit `04e300b` returned `BLOCKED`: fresh non-headless Flow and Boxing runtime opens exit `0` but logs are not clean because `InputManager` reports `Provider 'camera_tracking' failed startup test`; the playable scenes do not expose a scene/UI/settings path to choose replay before provider startup, so live/replay camera, T-pose calibration, overlay fade, audio/gameplay sync, hit SFX, miss tracking, recalibration pause/resume, completion summary, FileDialog selection/display, and first-person runtime cell placement remain unproven. Follow-up runner bead `aerobeat-gameplay-runner-o9t` was created and linked as a dependency of `aerobeat-gameplay-runner-an1`. Environment-loader follow-up bead `aerobeat-environment-loader-i7s` was created for visible splat rendering beyond the current placeholder/anchor path.
 
 ---
 
 ## Final Results
 
-**Status:** ⚠️ Partial
+**Status:** ❌ Blocked
 
-**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is committed and pushed, coder follow-up fixes for the static QA blockers are committed and pushed, and the static/headless QA retry passed. Final manual/high-fidelity audit remains before the playable seam can close.
+**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is committed and pushed, coder follow-up fixes for the static QA blockers are committed and pushed, and the static/headless QA retry passed. Final manual/high-fidelity audit is blocked on runner camera/replay startup (`aerobeat-gameplay-runner-o9t`) and environment-loader splat display ownership (`aerobeat-environment-loader-i7s`).
 
 **Reference Check:** Subagent reviews completed against referenced repos. The final readiness audit passed after freeze edits and closed `aerobeat-gameplay-runner-7l8`.
 
@@ -356,8 +356,9 @@ Before QA and audit can pass, the coder/QA evidence must include:
 - `076ca8e` - Record playable testbed QA blockers
 - `e362153` - Fix playable testbed QA blockers
 - `5abcd88` - Record playable testbed QA retry
+- `04e300b` - Record playable testbed QA retry in plan
 
-**Lessons Learned:** Pending.
+**Lessons Learned:** Static/headless coverage can prove the target mapping and overlay toggle regressions, but the playable seam still needs an explicit live/replay provider configuration path before manual runtime validation can prove calibration and gameplay behavior.
 
 ---
 
