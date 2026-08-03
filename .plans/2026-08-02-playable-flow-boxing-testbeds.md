@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-02  
 **Status:** In Progress  
-**Last Updated:** 2026-08-02 20:28 EDT
-**Blocked Reason:** None for the runner camera-source selection seam; Task 4 closed `aerobeat-gameplay-runner-o9t` at commit `987d1bd`. Final completion still depends on QA/audit rerunning the manual/high-fidelity gate and on the environment-owned splat-display follow-up `aerobeat-tool-environment-1ds`.
+**Last Updated:** 2026-08-02 20:32 EDT
+**Blocked Reason:** None for the runner camera-source selection seam; Task 4 closed `aerobeat-gameplay-runner-o9t` at commit `987d1bd` and Task 5 QA retry passed at commit `c550f76`. Final completion still depends on independent audit/manual high-fidelity closure and on the environment-owned splat-display follow-up `aerobeat-tool-environment-1ds`.
 **Agent:** pico
 
 ---
@@ -383,11 +383,11 @@ Before QA and audit can pass, the coder/QA evidence must include:
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/`
 
 **Files Created/Deleted/Modified:**
-- Pending QA notes.
+- `.plans/2026-08-02-playable-flow-boxing-testbeds.md` - recorded QA retry evidence and remaining manual/high-fidelity gate classification.
 
-**Status:** ⏳ Pending
+**Status:** ✅ Complete
 
-**Results:** Pending.
+**Results:** QA retry passed for the Task 4 camera-source seam and all automated/runtime-open gates at HEAD `c550f76`, after implementation commit `987d1bd`. QA verified provider startup is deferred out of `_ready()`/setup and into calibration request flow; Flow and Boxing expose `Live Camera` and `Replay Video`; replay uses a local filesystem `FileDialog`; selected replay paths are shaped into camera-tracking provider settings before `InputManager.register_provider`; and switching source before calibration unregisters any previous provider registration. Validation passed: GodotEnv sync, headless import with accepted pre-existing third-party GUT invalid UID fallback/ObjectDB import-exit warnings, full GUT (`4` scripts, `19` tests, `202` assertions), fresh headless Flow and Boxing opens, fresh non-headless Flow and Boxing opens with clean normal Godot/Vulkan output, class-name scan (`0` collisions, all severity buckets `0`), and `git diff --check`. QA classified the remaining manual/high-fidelity gates as not live-observed rather than failed: real live/replay camera feed, real T-pose calibration, audio/gameplay sync, hit SFX audibility, misses, recalibration pause/resume, completion summary, interactive FileDialog package/environment display, live overlay fade, and first-person cell `0/3/8/11` observation. Bead `aerobeat-gameplay-runner-an1` remains open for final audit/manual gate closure.
 
 ---
 
@@ -395,7 +395,7 @@ Before QA and audit can pass, the coder/QA evidence must include:
 
 **Status:** ⚠️ Partial / In Progress
 
-**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is committed and pushed, coder follow-up fixes for the static QA blockers are committed and pushed, and the static/headless QA retry passed. The stale runner camera/replay startup blocker was addressed by Task 4 in commit `987d1bd`; QA now needs to rerun the manual/high-fidelity gate. Environment-loader splat display remains tracked as environment-owned follow-up `aerobeat-tool-environment-1ds`.
+**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is committed and pushed, coder follow-up fixes for the static QA blockers are committed and pushed, and the static/headless QA retry passed. The stale runner camera/replay startup blocker was addressed by Task 4 in commit `987d1bd`; Task 5 QA retry passed at `c550f76` and left only the final manual/high-fidelity audit gates for closure. Environment-loader splat display remains tracked as environment-owned follow-up `aerobeat-tool-environment-1ds`.
 
 **Reference Check:** Subagent reviews completed against referenced repos. The final readiness audit passed after freeze edits and closed `aerobeat-gameplay-runner-7l8`.
 
@@ -407,6 +407,7 @@ Before QA and audit can pass, the coder/QA evidence must include:
 - `5abcd88` - Record playable testbed QA retry
 - `04e300b` - Record playable testbed QA retry in plan
 - `987d1bd` - Add playable camera source selection
+- `c550f76` - Record camera source QA retry
 
 **Lessons Learned:** Static/headless coverage can prove the target mapping and overlay toggle regressions. Manual runtime validation needs source selection before provider startup and should separate runner-owned camera/replay flow from environment-owned display gaps.
 
