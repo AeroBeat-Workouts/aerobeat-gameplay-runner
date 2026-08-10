@@ -1,8 +1,8 @@
 # AeroBeat Gameplay Runner Playable Testbed Load/Camera Warnings
 
 **Date:** 2026-08-10  
-**Status:** In Progress  
-**Last Updated:** 2026-08-10 16:15 EDT  
+**Status:** Complete  
+**Last Updated:** 2026-08-10 16:25 EDT  
 **Hardware Limitation:** No `/dev/video*` or `/dev/media*` devices are available on this host, so real live-camera capture was not validated. The no-device live-camera provider registration/calibration/unregister path was retried in a non-headless runtime and is clean.
 **Agent:** pico
 
@@ -285,25 +285,41 @@ Because this touches Godot runtime scenes, validation must include a fresh open 
 **Files Created/Deleted/Modified:**
 - `.plans/2026-08-10-playable-testbed-load-camera-warnings.md`
 
-**Status:** ⏳ Pending
+**Status:** ✅ Complete
 
-**Results:** Pending.
+**Results:** Independent audit passed 2026-08-10 16:25 EDT. Evidence reviewed:
+- User screenshots `REF-01`/`REF-02` were accounted for: reload warnings from duplicate global-class preload names, untyped iterators, integer division, unused/shadowed variables, and ternary typing were fixed in runner/source-owned repos; runtime `chart_for_mode_missing` now reports available mode/difficulty guidance; live-camera status now reports provider readiness, camera list, and last error instead of stale `Live camera: 0` only.
+- Beads `aerobeat-gameplay-runner-k1f`, `aerobeat-gameplay-runner-98n`, `aerobeat-gameplay-runner-2sk`, `aerobeat-gameplay-runner-cng`, and `aerobeat-gameplay-runner-0rg` were closed with evidence matching Tasks 1 through 4.5.
+- Runner commits reviewed: `581eebf` implemented playable diagnostics and YAML/media routing; `a816baf` recorded source warning cleanup; `e6f4458` recorded the first QA blocker; `7695aa4` fixed live-camera provider unregister noise; `324aed6` recorded cleanup validation; `01b4ee0` recorded the QA retry pass.
+- Source commits verified present and pushed at `origin/main`: content-core `86ec83a`, environment-core `de2e66b`, environment-loader `27db7a9`, mode-core `89087c4`, mode-boxing `64e85e1`, mode-flow `1a40756`, vendor-gdgs `f3ffe4d`, and input-core `728d361`.
+- Fresh required QA retry logs were inspected and passed zero-noise scans for unexpected `WARNING`, `ERROR`, `SCRIPT ERROR`, `Parse Error`, `ObjectDB`, orphan/leak/resource, `Cannot disconnect`, `ExpectedError`, `FAIL`, and unexpected `failed` matches:
+  - `/tmp/aerobeat-runner-0rg-retry-import.log`
+  - `/tmp/aerobeat-runner-0rg-retry-gut.log`
+  - `/tmp/aerobeat-runner-0rg-retry-flow-runtime.log`
+  - `/tmp/aerobeat-runner-0rg-retry-boxing-runtime.log`
+  - `/tmp/aerobeat-runner-0rg-retry-playable-probe.log`
+- Expected no-camera diagnostic text remains in HUD/probe output only: `Last error: No live camera candidates were found during MediaPipe Python probe`. This is not unexpected noise because `find /dev -maxdepth 2 \( -name 'video*' -o -name 'media*' \) -print` returned no devices and `/dev/video*` does not exist on this host.
+- Cookie/local sync evidence was refreshed during audit:
+  - `/home/derrick/.openclaw/workspace/scripts/git-sync --all-aerobeat` completed with `68 ok, 0 failed`; runner and all touched source repos were clean at `main...origin/main`.
+  - `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --all-aerobeat --install --scrub-uids` completed with `64 ok, 0 failed`.
+- Runner and touched source repos were clean after sync. A temporary audit probe file was removed after use and is not part of the durable repo state.
 
 ---
 
 ## Final Results
 
-**Status:** ⏳ Pending
+**Status:** ✅ Complete
 
-**What We Built:** Pending.
+**What We Built:** Playable testbed loading and camera warning cleanup across runner UX, source-owned Godot reload warnings, environment YAML/media handling, and live-camera provider unregister cleanup. The runner now gives actionable wrong-mode song guidance, loads copied environment descriptors/media, reports no-camera provider status clearly, and exits the required validation paths without unexpected warning/error/leak/null-disconnect noise.
 
-**Reference Check:** Pending.
+**Reference Check:** `REF-01` reload warning classes were fixed in owner repos and verified through clean import/runtime logs. `REF-02` runtime failures were addressed: wrong-mode song packages now identify available charts and matching scenes; live-camera status now reports readiness/cameras/last error. `REF-03`/`REF-04` playable harness and copied assets were exercised in the QA retry. `REF-05` source-owned changes were made in the owning AeroBeat repos and synced through GodotEnv.
 
 **Commits:**
-- Pending.
+- Runner: `581eebf`, `a816baf`, `e6f4458`, `7695aa4`, `324aed6`, `01b4ee0`
+- Source repos: `86ec83a`, `de2e66b`, `27db7a9`, `89087c4`, `64e85e1`, `1a40756`, `f3ffe4d`, `728d361`
 
-**Lessons Learned:** Pending.
+**Lessons Learned:** The no-camera hardware path still needs explicit validation notes because provider registration can succeed while capture readiness cannot. Keeping source-owned reload cleanup in the owning repos and refreshing runner addons through GodotEnv gave a clean, auditable path.
 
 ---
 
-*Completed on pending*
+*Completed on 2026-08-10*
