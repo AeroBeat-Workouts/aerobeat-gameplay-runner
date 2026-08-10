@@ -1,0 +1,33 @@
+schemaId: aerobeat.song-package.v1
+schemaVersion: 1
+packageVersion: 0.1.0
+songId: ab-song-beatsaver-47fb6
+songName: BeatSaver 47fb6 Regression Fixture
+source:
+  provider: beatsaver
+  beatsaverId: "47fb6"
+regression:
+  group: Kpop Demon Hunters - K-Pop
+  difficultyRole: Simpler reference songs
+  fixtureScope: contract_valid_metadata_chart_slice
+  limitation: Synthetic fixture preserves approved BeatSaver ID and role; full BeatSaver map, audio, and cover assets are not included.
+song:
+  durationSec: 100
+  audio:
+    filePath: media/audio/beatsaver-47fb6-placeholder.ogg
+    durationMs: 100000
+  timing:
+    anchorMs: 0
+    tempoSegments:
+      - startBeat: 0
+        bpm: 128
+    stopSegments: []
+    timeSignatureSegments:
+      - startBeat: 0
+        numerator: 4
+        denominator: 4
+charts:
+  - chartId: ab-chart-beatsaver-47fb6-flow-normal
+    mode: flow
+    difficulty: Normal
+    path: charts/ab-chart-beatsaver-47fb6-flow-normal.yaml

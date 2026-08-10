@@ -1,0 +1,8 @@
+schemaId: aerobeat.environment.v1
+schemaVersion: 1
+recordVersion: 1
+environmentId: ab-environment-glb-demo
+environmentName: GLB Demo Environment
+type: glb_environment
+resourcePath: ../media/models/alien-moon-icescape/alien-moon-icescape.glb
+configPath: ../media/models/alien-moon-icescape/alien-moon-icescape.config.yaml

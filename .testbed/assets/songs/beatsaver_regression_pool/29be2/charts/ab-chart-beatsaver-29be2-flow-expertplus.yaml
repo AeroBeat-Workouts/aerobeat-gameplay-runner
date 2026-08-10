@@ -1,0 +1,34 @@
+schemaId: aerobeat.chart.flow.v1
+schemaVersion: 1
+recordVersion: 1
+chartId: ab-chart-beatsaver-29be2-flow-expertplus
+chartName: BeatSaver 29be2 Flow ExpertPlus Regression Slice
+mode: flow
+difficulty: ExpertPlus
+source:
+  provider: beatsaver
+  beatsaverId: "29be2"
+regression:
+  group: Sonic Songs - Heavy Metal / Rock
+  difficultyRole: Very fast upper-end speed references
+beats:
+  - start: 1.0
+    type: note
+    hand: left
+    placement: 1
+    requiresDirection: true
+    direction: 2
+  - start: 1.5
+    type: note
+    hand: right
+    placement: 10
+    requiresDirection: true
+    direction: 6
+  - start: 2.0
+    end: 2.75
+    type: burst
+    hand: left
+    placement: 4
+    direction: 2
+    tailPlacement: 7
+    checkpointCount: 2

@@ -1,0 +1,33 @@
+schemaId: aerobeat.song-package.v1
+schemaVersion: 1
+packageVersion: 0.1.0
+songId: ab-song-beatsaver-226e
+songName: BeatSaver 226e Regression Fixture
+source:
+  provider: beatsaver
+  beatsaverId: "226e"
+regression:
+  group: Linkin Park - Rock Alternative
+  difficultyRole: Mid-level challenge references for Derrick's Expert baseline
+  fixtureScope: contract_valid_metadata_chart_slice
+  limitation: Synthetic fixture preserves approved BeatSaver ID and role; full BeatSaver map, audio, and cover assets are not included.
+song:
+  durationSec: 110
+  audio:
+    filePath: media/audio/beatsaver-226e-placeholder.ogg
+    durationMs: 110000
+  timing:
+    anchorMs: 0
+    tempoSegments:
+      - startBeat: 0
+        bpm: 160
+    stopSegments: []
+    timeSignatureSegments:
+      - startBeat: 0
+        numerator: 4
+        denominator: 4
+charts:
+  - chartId: ab-chart-beatsaver-226e-boxing-expert
+    mode: boxing
+    difficulty: Expert
+    path: charts/ab-chart-beatsaver-226e-boxing-expert.yaml

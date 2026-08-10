@@ -1,0 +1,20 @@
+schemaId: aerobeat.chart.boxing.v1
+schemaVersion: 1
+recordVersion: 1
+chartId: ab-chart-beatsaver-3d44b-boxing-normal
+chartName: BeatSaver 3d44b Boxing Normal Regression Slice
+mode: boxing
+difficulty: Normal
+source:
+  provider: beatsaver
+  beatsaverId: "3d44b"
+regression:
+  group: Game Grumps / NSP - Meme
+  difficultyRole: Simpler/meme reference songs
+beats:
+  - start: 1.0
+    type: straight_left
+  - start: 2.0
+    type: straight_right
+  - start: 3.0
+    type: guard

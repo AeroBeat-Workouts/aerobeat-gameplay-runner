@@ -1,0 +1,36 @@
+schemaId: aerobeat.song-package.v1
+schemaVersion: 1
+packageVersion: 1.0.0
+songId: ab-song-splat-demo
+songName: Splat Demo Song
+cover:
+  path: media/cover/splat-demo-cover.png
+song:
+  durationSec: 90
+  audio:
+    filePath: media/audio/splat-demo.ogg
+    previewFilePath: media/audio/splat-demo-preview.ogg
+    previewUrl: https://cdn.example.invalid/beatsaver/splat-demo-preview.mp3
+    previewStartTime: 12.5
+    previewDuration: 3.25
+    previewMode: preview_file
+    durationMs: 90000
+  timing:
+    anchorMs: 0
+    tempoSegments:
+      - startBeat: 0
+        bpm: 128
+    stopSegments: []
+    timeSignatureSegments:
+      - startBeat: 0
+        numerator: 4
+        denominator: 4
+charts:
+  - chartId: ab-chart-splat-demo-boxing-normal
+    mode: boxing
+    difficulty: Normal
+    path: charts/ab-chart-splat-demo-boxing-normal.yaml
+  - chartId: ab-chart-splat-demo-boxing-hard
+    mode: boxing
+    difficulty: Hard
+    path: charts/ab-chart-splat-demo-boxing-hard.yaml

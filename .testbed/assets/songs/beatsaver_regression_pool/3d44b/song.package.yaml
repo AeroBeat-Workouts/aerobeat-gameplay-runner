@@ -1,0 +1,33 @@
+schemaId: aerobeat.song-package.v1
+schemaVersion: 1
+packageVersion: 0.1.0
+songId: ab-song-beatsaver-3d44b
+songName: BeatSaver 3d44b Regression Fixture
+source:
+  provider: beatsaver
+  beatsaverId: "3d44b"
+regression:
+  group: Game Grumps / NSP - Meme
+  difficultyRole: Simpler/meme reference songs
+  fixtureScope: contract_valid_metadata_chart_slice
+  limitation: Synthetic fixture preserves approved BeatSaver ID and role; full BeatSaver map, audio, and cover assets are not included.
+song:
+  durationSec: 95
+  audio:
+    filePath: media/audio/beatsaver-3d44b-placeholder.ogg
+    durationMs: 95000
+  timing:
+    anchorMs: 0
+    tempoSegments:
+      - startBeat: 0
+        bpm: 120
+    stopSegments: []
+    timeSignatureSegments:
+      - startBeat: 0
+        numerator: 4
+        denominator: 4
+charts:
+  - chartId: ab-chart-beatsaver-3d44b-boxing-normal
+    mode: boxing
+    difficulty: Normal
+    path: charts/ab-chart-beatsaver-3d44b-boxing-normal.yaml

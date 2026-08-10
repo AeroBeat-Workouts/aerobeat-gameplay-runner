@@ -1,0 +1,27 @@
+schemaId: aerobeat.chart.flow.v1
+schemaVersion: 1
+recordVersion: 1
+chartId: ab-chart-beatsaver-47fb6-flow-normal
+chartName: BeatSaver 47fb6 Flow Normal Regression Slice
+mode: flow
+difficulty: Normal
+source:
+  provider: beatsaver
+  beatsaverId: "47fb6"
+regression:
+  group: Kpop Demon Hunters - K-Pop
+  difficultyRole: Simpler reference songs
+beats:
+  - start: 1.0
+    type: note
+    hand: left
+    placement: 5
+    requiresDirection: false
+  - start: 2.0
+    type: note
+    hand: right
+    placement: 6
+    requiresDirection: false
+  - start: 3.0
+    type: bomb
+    placement: 1

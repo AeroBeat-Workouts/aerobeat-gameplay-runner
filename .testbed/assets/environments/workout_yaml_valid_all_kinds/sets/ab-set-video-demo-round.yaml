@@ -1,0 +1,7 @@
+schemaId: aerobeat.set.v1
+schemaVersion: 1
+recordVersion: 1
+setId: ab-set-video-demo-round
+setName: Video Demo Round
+preferredEnvironmentId: ab-environment-video-demo
+fallbackEnvironmentId: ab-environment-video-demo

@@ -1,0 +1,12 @@
+schemaId: aerobeat.chart.boxing.v1
+schemaVersion: 1
+recordVersion: 1
+chartId: ab-chart-splat-demo-boxing-normal
+chartName: Splat Demo Boxing Normal
+mode: boxing
+difficulty: Normal
+beats:
+  - start: 1.0
+    type: straight_left
+  - start: 2.0
+    type: straight_right

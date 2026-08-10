@@ -1,0 +1,12 @@
+schemaId: aerobeat.chart.boxing.v1
+schemaVersion: 1
+recordVersion: 1
+chartId: ab-chart-splat-demo-boxing-hard
+chartName: Splat Demo Boxing Hard
+mode: boxing
+difficulty: Hard
+beats:
+  - start: 1.0
+    type: hook_left
+  - start: 2.0
+    type: hook_right

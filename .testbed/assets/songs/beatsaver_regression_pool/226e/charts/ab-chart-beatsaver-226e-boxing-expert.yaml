@@ -1,0 +1,22 @@
+schemaId: aerobeat.chart.boxing.v1
+schemaVersion: 1
+recordVersion: 1
+chartId: ab-chart-beatsaver-226e-boxing-expert
+chartName: BeatSaver 226e Boxing Expert Regression Slice
+mode: boxing
+difficulty: Expert
+source:
+  provider: beatsaver
+  beatsaverId: "226e"
+regression:
+  group: Linkin Park - Rock Alternative
+  difficultyRole: Mid-level challenge references for Derrick's Expert baseline
+beats:
+  - start: 1.0
+    type: straight_left
+  - start: 1.75
+    type: hook_right
+  - start: 2.5
+    type: uppercut_left
+  - start: 3.25
+    type: weave_right

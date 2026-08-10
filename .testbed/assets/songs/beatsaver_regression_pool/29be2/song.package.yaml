@@ -1,0 +1,33 @@
+schemaId: aerobeat.song-package.v1
+schemaVersion: 1
+packageVersion: 0.1.0
+songId: ab-song-beatsaver-29be2
+songName: BeatSaver 29be2 Regression Fixture
+source:
+  provider: beatsaver
+  beatsaverId: "29be2"
+regression:
+  group: Sonic Songs - Heavy Metal / Rock
+  difficultyRole: Very fast upper-end speed references
+  fixtureScope: contract_valid_metadata_chart_slice
+  limitation: Synthetic fixture preserves approved BeatSaver ID and role; full BeatSaver map, audio, and cover assets are not included.
+song:
+  durationSec: 120
+  audio:
+    filePath: media/audio/beatsaver-29be2-placeholder.ogg
+    durationMs: 120000
+  timing:
+    anchorMs: 0
+    tempoSegments:
+      - startBeat: 0
+        bpm: 210
+    stopSegments: []
+    timeSignatureSegments:
+      - startBeat: 0
+        numerator: 4
+        denominator: 4
+charts:
+  - chartId: ab-chart-beatsaver-29be2-flow-expertplus
+    mode: flow
+    difficulty: ExpertPlus
+    path: charts/ab-chart-beatsaver-29be2-flow-expertplus.yaml
