@@ -8,6 +8,7 @@ const ContentLoader := preload("res://scripts/playable_content_loader.gd")
 const EnvironmentAdapter := preload("res://scripts/environment_loader_adapter.gd")
 const TargetRegions := preload("res://scripts/playable_target_regions.gd")
 const CameraSourcePickerState := preload("res://scripts/camera_source_picker_state.gd")
+const CameraTrackingConfigScript := preload("res://addons/aerobeat-input-camera-tracking/src/config/camera_tracking_config.gd")
 const GameplayRunConfig := preload("res://addons/aerobeat-gameplay-runner/src/data_types/gameplay_run_config.gd")
 const GameplayRunState := preload("res://addons/aerobeat-gameplay-runner/src/data_types/gameplay_run_state.gd")
 const GameplaySession := preload("res://addons/aerobeat-gameplay-runner/src/runtime/gameplay_session.gd")
@@ -137,7 +138,7 @@ func _load_song(path: String) -> void:
 	if not bool(_loaded_content.get("ok", false)):
 		_update_hud("Song load failed: %s" % _loaded_content.get("error", "unknown"))
 		return
-	_targets = _as_array(_loaded_content.get("events", [])).duplicate(true)
+	_targets = dictionary_array(_loaded_content.get("events", []))
 	_build_target_nodes()
 	var audio_path := String(_loaded_content.get("audio_path", ""))
 	if not audio_path.is_empty():
@@ -247,6 +248,11 @@ func _ensure_input_provider_registered() -> bool:
 	var settings: Dictionary = _camera_source.provider_settings()
 	var provider := CameraTrackingInputProviderScript.new()
 	provider.name = "CameraTrackingInputProvider"
+	var tracking_singleton := _prepare_camera_tracking_runtime(settings)
+	if tracking_singleton != null and provider.has_method("set_tracking_session") and tracking_singleton.has_method("get_tracking_session_if_ready"):
+		var tracking_session: Node = tracking_singleton.get_tracking_session_if_ready()
+		if tracking_session != null:
+			provider.set_tracking_session(tracking_session)
 	if provider.has_method("set_selected_camera_device_id"):
 		provider.set_selected_camera_device_id(String(settings.get("camera_source", "")))
 	if not _input_manager.register_provider(provider, settings):
@@ -255,6 +261,41 @@ func _ensure_input_provider_registered() -> bool:
 	_camera_provider_registered = true
 	_update_hud("Camera input provider registered with %s." % _camera_source.status_text())
 	return true
+
+func _prepare_camera_tracking_runtime(settings: Dictionary) -> Node:
+	var tracking_singleton := get_node_or_null("/root/AeroCameraTracking")
+	if tracking_singleton == null:
+		return null
+	var runtime_config := _camera_tracking_runtime_config(settings)
+	var source: Dictionary = settings.get("source", {}) if settings.get("source", {}) is Dictionary else {}
+	var source_kind := String(source.get("kind", "")).strip_edges()
+	if source_kind == CameraSourcePickerState.MODE_REPLAY and tracking_singleton.has_method("start_replay"):
+		tracking_singleton.start_replay(String(source.get("path", "")).strip_edges(), runtime_config)
+	elif source_kind == CameraSourcePickerState.MODE_LIVE and tracking_singleton.has_method("start_live_camera"):
+		tracking_singleton.start_live_camera(String(source.get("camera_id", settings.get("camera_source", ""))).strip_edges(), runtime_config)
+	elif tracking_singleton.has_method("start"):
+		tracking_singleton.start(runtime_config)
+	return tracking_singleton
+
+func _camera_tracking_runtime_config(settings: Dictionary) -> Resource:
+	var runtime_config := CameraTrackingConfigScript.new()
+	runtime_config.profile = mode_id
+	var source_id := String(settings.get("selected_camera_device_id", settings.get("camera_source", ""))).strip_edges()
+	if not source_id.is_empty() and runtime_config.has_method("set_selected_camera_device_id"):
+		runtime_config.set_selected_camera_device_id(source_id)
+	var vendor_root := ProjectSettings.globalize_path("res://addons/aerobeat-vendor-mediapipe-python")
+	var vendor_python := vendor_root.path_join(".venv/bin/python")
+	var vendor_entrypoint := vendor_root.path_join("runtime/mediapipe_runtime_probe.py")
+	var vendor_model := vendor_root.path_join("models/pose_landmarker_lite.task")
+	if FileAccess.file_exists(vendor_python) and FileAccess.file_exists(vendor_entrypoint):
+		runtime_config.runtime = {
+			"python_executable": vendor_python,
+			"entrypoint": vendor_entrypoint,
+			"working_directory": vendor_root,
+			"model_complexity": 0,
+			"pose_landmarker_model_path": vendor_model if FileAccess.file_exists(vendor_model) else "",
+		}
+	return runtime_config
 
 func _mode_chart_data() -> Dictionary:
 	if mode_id == "boxing":
@@ -391,5 +432,11 @@ func _update_camera_source_label() -> void:
 func _as_dict(value: Variant) -> Dictionary:
 	return value if value is Dictionary else {}
 
-func _as_array(value: Variant) -> Array:
-	return value if value is Array else []
+static func dictionary_array(value: Variant) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	if not value is Array:
+		return result
+	for item in value:
+		if item is Dictionary:
+			result.append((item as Dictionary).duplicate(true))
+	return result

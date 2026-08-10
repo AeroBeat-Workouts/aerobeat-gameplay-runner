@@ -1,6 +1,7 @@
 extends "res://addons/aerobeat-vendor-godot-unit-test/test.gd"
 
 const CameraSourcePickerState := preload("res://scripts/camera_source_picker_state.gd")
+const PlayableTestbedHarness := preload("res://scripts/playable_testbed_harness.gd")
 
 func test_live_camera_settings_are_ready_for_provider_registration() -> void:
 	var picker := CameraSourcePickerState.new()
@@ -30,3 +31,14 @@ func test_empty_replay_path_is_not_configured() -> void:
 
 	assert_false(picker.is_configured())
 	assert_true(picker.provider_settings().is_empty())
+
+func test_playable_targets_are_copied_into_typed_dictionary_array() -> void:
+	var source := [{"id": "a"}, "skip", {"id": "b"}]
+	var targets: Array[Dictionary] = PlayableTestbedHarness.dictionary_array(source)
+
+	assert_eq(targets.size(), 2)
+	assert_eq(targets[0].id, "a")
+	assert_eq(targets[1].id, "b")
+
+	source[0].id = "changed"
+	assert_eq(targets[0].id, "a")

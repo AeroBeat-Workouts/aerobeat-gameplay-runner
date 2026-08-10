@@ -410,6 +410,34 @@ Before QA and audit can pass, the coder/QA evidence must include:
 
 ---
 
+### Task 7: Fix Playable Manual Gate Startup Blockers
+
+**Bead ID:** `aerobeat-gameplay-runner-eqo`
+**SubAgent:** `primary` (for `coder` workflow role)
+**Role:** `coder`
+**References:** `REF-01`, `REF-08`
+**Prompt:** Claim bead `aerobeat-gameplay-runner-eqo` on start. Fix the 2026-08-10 QA blockers: typed target assignment in `playable_testbed_harness.gd` and replay provider registration failing even though selected replay settings contain the local video path. Add focused coverage, rerun the manual-gate validation slice, update this plan and bead notes, and leave `aerobeat-gameplay-runner-an1` open unless the full Manual Validation Gate passes.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed/`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.plans/`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/src/`
+
+**Files Created/Deleted/Modified:**
+- `.testbed/scripts/playable_testbed_harness.gd` - converts loaded content events into a typed `Array[Dictionary]`; primes `AeroCameraTracking` with the selected live/replay source, vendor runtime config, and tracking session before `InputManager.register_provider`.
+- `.testbed/addons.jsonc` - adds the missing `aerobeat-vendor-mediapipe-python` testbed dependency required by `aerobeat-tool-camera-tracking` replay startup.
+- `.testbed/tests/test_camera_source_picker_state.gd` - adds focused coverage that target dictionaries are deeply copied into a typed array.
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/src/input_manager.gd` - source-owned minimal fix so Boxing punch provider signals with a power payload can proxy through the no-argument input-core gameplay intent signals without runtime signal-call errors.
+- `.plans/2026-08-02-playable-flow-boxing-testbeds.md` - recorded this task and validation evidence.
+
+**Status:** ✅ Implemented
+
+**Results:** The typed target blocker is fixed: the recreated high-fidelity runner selected real Flow and Boxing song packages and loaded nonzero targets/target nodes without the prior typed-array script error (`Flow: 3 targets/3 target node groups`, `Boxing: 4 targets/4 target node groups`). The replay registration blocker is fixed in the runner-owned seam: replay source selection now starts/primes the `AeroCameraTracking` autoload with the selected MP4, passes the vendor Python runtime/entrypoint/model from the installed addon when available, injects the prepared tracking session into the camera provider before `InputManager` probes it, and preserves the selected replay path through active provider selection. The validation runner proved `camera_tracking` registers for both scenes with the selected local replay path as `get_active_provider_selected_camera_device_id()`. A small input-core owner fix was required after replay startup began emitting Boxing punch signals with power payloads; the manager now accepts and drops that optional payload while preserving the no-arg public signal contract.
+
+Validation passed: GodotEnv sync, vendor runtime prep (`python3 scripts/prepare_vendor_runtime.py --json` in `aerobeat-vendor-mediapipe-python`), Godot import smoke, runner full GUT (`20` tests, `206` assertions), fresh non-headless Flow and Boxing scene opens with clean normal Godot/Vulkan output, recreated high-fidelity replay/song validation for Flow and Boxing, input-core full GUT (`41` tests, `442` assertions), class-name scan (`0` collisions), and `git diff --check` for both runner and input-core. Accepted exceptions: headless import still reports existing third-party GUT invalid UID fallback warnings and an ObjectDB leak warning on editor-import exit; the replay validation emits upstream MediaPipe/TFLite informational warnings and an ObjectDB/resource leak warning on scripted exit, but exits `0` with no runner script errors and no provider registration failure. `aerobeat-gameplay-runner-an1` remains open because the complete live/manual session gate still needs human-observed calibration, playback, overlays, audio/gameplay, hits/misses, recalibration, completion summary, environment display, and first-person cell observation.
+
+---
+
 ## Final Results
 
 **Status:** ❌ Blocked / Waiting on Manual Test

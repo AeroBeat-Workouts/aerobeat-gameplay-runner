@@ -26,6 +26,11 @@
       "source": "symlink",
       "subfolder": "/"
     },
+    "aerobeat-vendor-mediapipe-python": {
+      "url": "../../aerobeat-vendor-mediapipe-python",
+      "source": "symlink",
+      "subfolder": "/"
+    },
     "aerobeat-content-core": {
       "url": "../../aerobeat-content-core",
       "source": "symlink",
