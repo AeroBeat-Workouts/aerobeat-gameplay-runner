@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-02  
 **Status:** Blocked  
-**Last Updated:** 2026-08-10 09:44 EDT
-**Blocked Reason:** Startup/runtime noise cleanup is complete: Task 8 restored the missing camera-recording testbed dependency, Task 11 removed stale GUT vendor `ext_resource` UID references, and Task 12 cleaned the GUT headless import ObjectDB warning at vendor source. Final closure remains blocked on `aerobeat-gameplay-runner-an1` until Derrick manually observes a real playable session proving calibration/playback, overlays, audio/gameplay sync, hits/misses, recalibration, completion summary, environment display, and first-person cells `0/3/8/11`. Environment-owned splat-display follow-up remains tracked by `aerobeat-tool-environment-1ds`.
+**Last Updated:** 2026-08-10 11:28 EDT
+**Blocked Reason:** Task 8 fixed the runner-owned startup parse errors by restoring the missing camera-recording testbed dependency. Task 11 removed the remaining GUT vendor UID fallback warnings at the owning vendor source. Task 12 removed the remaining ObjectDB import-exit warning by updating the owning GUT vendor plugin headless-import path in commit `99f1939`, and zero-noise import/GUT/scene-open validation now passes. Final closure remains blocked on `aerobeat-gameplay-runner-an1` until Derrick manually observes a real playable session proving calibration/playback, overlays, audio/gameplay sync, hits/misses, recalibration, completion summary, environment display, and first-person cells `0/3/8/11`. Environment-owned splat-display follow-up remains tracked by `aerobeat-tool-environment-1ds`.
 **Agent:** pico
 
 ---
@@ -555,11 +555,25 @@ Initial QA could not pass because the required import log still emitted `WARNING
 
 **Files Created/Deleted/Modified:**
 - `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-vendor-godot-unit-test/gut_plugin.gd`
-- `.plans/2026-08-02-playable-flow-boxing-testbeds.md`
+- `.plans/2026-08-02-playable-flow-boxing-testbeds.md` - records Task 12 zero-noise evidence.
 
-**Status:** ✅ Complete
+**Status:** ✅ Complete; zero-noise import validation restored.
 
-**Results:** The remaining ObjectDB import-exit warning was cleaned in the GUT vendor source by skipping the editor-only timer/update-check path during headless editor import and guarding optional update-check cleanup. Final validation passed: GodotEnv sync, headless import, full runner GUT (`4` scripts, `20` tests, `206` assertions), fresh headless Flow and Boxing scene opens, fresh non-headless Flow and Boxing scene opens, and `git diff --check` in runner and vendor repos. Targeted log inspection found no warning/error/UID/parse/script/camera-tracking/runner/tool/ObjectDB/leak noise. Cookie was refreshed after the cleanup landed: AeroBeat git sync succeeded, GodotEnv sync reported `68 ok, 0 failed`, a generated `.testbed/project.godot` diff in Cookie's runner checkout was restored to synced state, and a final direct AeroBeat repo sweep reported 73 clean repos.
+**Results:** The remaining ObjectDB import-exit warning was source-owned by the GUT vendor editor plugin, not by generated runner `.testbed/addons/` state. Verbose import had identified one leaked `SceneTreeTimer` with reference count `1`; the owning source was `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-vendor-godot-unit-test/gut_plugin.gd`, where `_enter_tree()` awaited `get_tree().create_timer(1).timeout` during headless editor import after `_should_continue_loading_gut()` created update-check UI state.
+
+The vendor fix landed in `aerobeat-vendor-godot-unit-test` commit `99f1939` (`Skip GUT editor update timer in headless import`). It skips the optional update dialog/update-check path when `DisplayServer.get_name() == "headless"`, skips the one-second editor startup timer in headless import, and guards `_check_for_update` cleanup because that optional UI control is no longer instantiated in the headless path.
+
+Validation on 2026-08-10 after fast-forwarding the local vendor checkout and refreshing the runner workbench passed:
+- `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo .testbed --install --scrub-uids`: `1 ok, 0 failed`.
+- `godot --headless --verbose --path .testbed --import --quit`: exit `0`; targeted scan found no `WARNING`, `ERROR`, `ObjectDB`, `leak`, `SceneTreeTimer`, UID fallback, parse, or script-error lines.
+- Full runner GUT: `4` scripts, `20` tests, `206` assertions, all passed; targeted scan found no warning/error/leak/UID lines.
+- Fresh headless Flow and Boxing scene opens: exit `0`; targeted scans clean.
+- Fresh non-headless Flow and Boxing scene opens: first run warmed Godot renderer shader-cache directories and emitted shader-cache creation errors; immediate fresh rerun exited `0` for both scenes with only normal Godot/Vulkan output and clean targeted scans.
+- `git diff --check` passed in both runner and `aerobeat-vendor-godot-unit-test`.
+
+Bead `aerobeat-gameplay-runner-08f` is closed with the same owning-source evidence. Parent bead `aerobeat-gameplay-runner-an1` remains open because Task 12 did not perform the full human-observed Manual Validation Gate.
+
+Cookie was also refreshed after the cleanup landed: AeroBeat git sync succeeded, GodotEnv sync reported `68 ok, 0 failed`, a generated `.testbed/project.godot` diff in Cookie's runner checkout was restored to synced state, and a final direct AeroBeat repo sweep reported 73 clean repos.
 
 ---
 
@@ -567,7 +581,7 @@ Initial QA could not pass because the required import log still emitted `WARNING
 
 **Status:** ❌ Blocked / Waiting on Manual Test
 
-**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is committed and pushed, coder follow-up fixes for the static QA blockers are committed and pushed, and the static/headless QA retry passed. The stale runner camera/replay startup blocker was addressed by Task 4 in commit `987d1bd`; Task 5 QA retry passed at `c550f76`; Task 6 audit confirmed the code and runtime-open gates were clean but blocked final closure on live/manual proof. Task 7 fixed the later typed target and replay provider registration blockers in commits `0ff2522` and `3a12f49`, and recreated high-fidelity replay/song validation now passes for Flow and Boxing. Task 8 fixed the startup parse errors in the gameplay runner testbed by restoring the missing `aerobeat-tool-camera-recording` dependency required by `aerobeat-tool-camera-tracking` replay backends; fresh Flow and Boxing opens are clean. Derrick confirmed the next step is manual testing and feedback in the next AeroBeat session. Environment-loader splat display remains tracked as environment-owned follow-up `aerobeat-tool-environment-1ds`.
+**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is committed and pushed, coder follow-up fixes for the static QA blockers are committed and pushed, and the static/headless QA retry passed. The stale runner camera/replay startup blocker was addressed by Task 4 in commit `987d1bd`; Task 5 QA retry passed at `c550f76`; Task 6 audit confirmed the code and runtime-open gates were clean but blocked final closure on live/manual proof. Task 7 fixed the later typed target and replay provider registration blockers in commits `0ff2522` and `3a12f49`, and recreated high-fidelity replay/song validation now passes for Flow and Boxing. Task 8 fixed the startup parse errors in the gameplay runner testbed by restoring the missing `aerobeat-tool-camera-recording` dependency required by `aerobeat-tool-camera-tracking` replay backends; fresh Flow and Boxing opens are clean. Tasks 11 and 12 cleaned the remaining GUT vendor UID and ObjectDB import-exit warning noise at the owning vendor source; zero-noise import, GUT, and fresh scene-open validation now passes. Derrick confirmed the next step is manual testing and feedback in the next AeroBeat session. Environment-loader splat display remains tracked as environment-owned follow-up `aerobeat-tool-environment-1ds`.
 
 **Reference Check:** Subagent reviews completed against referenced repos. The final readiness audit passed after freeze edits and closed `aerobeat-gameplay-runner-7l8`.
 
