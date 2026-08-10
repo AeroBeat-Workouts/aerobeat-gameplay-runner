@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-02  
 **Status:** Blocked  
-**Last Updated:** 2026-08-10 09:37 EDT
+**Last Updated:** 2026-08-10 09:44 EDT
 **Blocked Reason:** Startup/runtime noise cleanup is complete: Task 8 restored the missing camera-recording testbed dependency, Task 11 removed stale GUT vendor `ext_resource` UID references, and Task 12 cleaned the GUT headless import ObjectDB warning at vendor source. Final closure remains blocked on `aerobeat-gameplay-runner-an1` until Derrick manually observes a real playable session proving calibration/playback, overlays, audio/gameplay sync, hits/misses, recalibration, completion summary, environment display, and first-person cells `0/3/8/11`. Environment-owned splat-display follow-up remains tracked by `aerobeat-tool-environment-1ds`.
 **Agent:** pico
 
@@ -539,7 +539,7 @@ QA verified the source fix is in `/home/derrick/.openclaw/workspace/projects/aer
 
 QA validation ran `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo .testbed --install --scrub-uids`, `godot --headless --path .testbed --import --quit`, full runner GUT (`4` scripts, `20` tests, `206` assertions), fresh headless Flow scene open, fresh headless Boxing scene open, fresh non-headless Flow scene open, fresh non-headless Boxing scene open, and `git diff --check` in both runner and vendor repos. Targeted log inspection across sync/import/GUT/Flow/Boxing logs found no `invalid UID`, `Failed to load resource: UID`, `uid://`, parse, script, camera-tracking preload, or runner/tool error lines.
 
-Initial QA could not pass because the required import log still emitted `WARNING: ObjectDB instances leaked at exit (run with --verbose for details).` A verbose import identified one leaked `SceneTreeTimer` with reference count `1`; the owning source was the GUT editor plugin startup path awaiting `get_tree().create_timer(1).timeout` in `aerobeat-vendor-godot-unit-test/gut_plugin.gd` while the headless import exited. The follow-up vendor source cleanup skips the editor-only update/timer startup path in headless mode and guards the optional update UI cleanup. After refreshing the runner `.testbed`, final targeted log inspection across sync/import/GUT/Flow/Boxing logs found no `invalid UID`, `Failed to load resource: UID`, `uid://`, warning, error, parse, script, camera-tracking preload, runner/tool, ObjectDB, resource leak, or leak lines. Cookie sync is deferred to the orchestrator.
+Initial QA could not pass because the required import log still emitted `WARNING: ObjectDB instances leaked at exit (run with --verbose for details).` A verbose import identified one leaked `SceneTreeTimer` with reference count `1`; the owning source was the GUT editor plugin startup path awaiting `get_tree().create_timer(1).timeout` in `aerobeat-vendor-godot-unit-test/gut_plugin.gd` while the headless import exited. The follow-up vendor source cleanup skips the editor-only update/timer startup path in headless mode and guards the optional update UI cleanup. After refreshing the runner `.testbed`, final targeted log inspection across sync/import/GUT/Flow/Boxing logs found no `invalid UID`, `Failed to load resource: UID`, `uid://`, warning, error, parse, script, camera-tracking preload, runner/tool, ObjectDB, resource leak, or leak lines. Cookie was then synced with `git-sync --all-aerobeat` and `godotenv-sync --all-aerobeat --install --scrub-uids`; Cookie's direct AeroBeat repo sweep checked 73 git repos and found all clean.
 
 ### Task 12: Clean Remaining ObjectDB Import-Exit Warning
 
@@ -559,7 +559,7 @@ Initial QA could not pass because the required import log still emitted `WARNING
 
 **Status:** ✅ Complete
 
-**Results:** The remaining ObjectDB import-exit warning was cleaned in the GUT vendor source by skipping the editor-only timer/update-check path during headless editor import and guarding optional update-check cleanup. Final validation passed: GodotEnv sync, headless import, full runner GUT (`4` scripts, `20` tests, `206` assertions), fresh headless Flow and Boxing scene opens, fresh non-headless Flow and Boxing scene opens, and `git diff --check` in runner and vendor repos. Targeted log inspection found no warning/error/UID/parse/script/camera-tracking/runner/tool/ObjectDB/leak noise.
+**Results:** The remaining ObjectDB import-exit warning was cleaned in the GUT vendor source by skipping the editor-only timer/update-check path during headless editor import and guarding optional update-check cleanup. Final validation passed: GodotEnv sync, headless import, full runner GUT (`4` scripts, `20` tests, `206` assertions), fresh headless Flow and Boxing scene opens, fresh non-headless Flow and Boxing scene opens, and `git diff --check` in runner and vendor repos. Targeted log inspection found no warning/error/UID/parse/script/camera-tracking/runner/tool/ObjectDB/leak noise. Cookie was refreshed after the cleanup landed: AeroBeat git sync succeeded, GodotEnv sync reported `68 ok, 0 failed`, a generated `.testbed/project.godot` diff in Cookie's runner checkout was restored to synced state, and a final direct AeroBeat repo sweep reported 73 clean repos.
 
 ---
 
