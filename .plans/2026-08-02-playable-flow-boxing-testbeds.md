@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-02  
 **Status:** Blocked  
-**Last Updated:** 2026-08-10 07:08 EDT
-**Blocked Reason:** Task 7 fixed the static replay startup blockers and closed `aerobeat-gameplay-runner-eqo`; final closure remains blocked on `aerobeat-gameplay-runner-an1` until Derrick manually observes a real playable session proving calibration/playback, overlays, audio/gameplay sync, hits/misses, recalibration, completion summary, environment display, and first-person cells `0/3/8/11`. Environment-owned splat-display follow-up remains tracked by `aerobeat-tool-environment-1ds`.
+**Last Updated:** 2026-08-10 08:15 EDT
+**Blocked Reason:** Task 8 fixed the runner-owned startup parse errors by restoring the missing camera-recording testbed dependency; final closure remains blocked on `aerobeat-gameplay-runner-an1` until Derrick manually observes a real playable session proving calibration/playback, overlays, audio/gameplay sync, hits/misses, recalibration, completion summary, environment display, and first-person cells `0/3/8/11`. Environment-owned splat-display follow-up remains tracked by `aerobeat-tool-environment-1ds`.
 **Agent:** pico
 
 ---
@@ -40,6 +40,7 @@ Spatial behavior must be grid-driven. The play area is defined by translating th
 | `REF-10` | Environment loading and background package contracts | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-environment-core`, `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-environment-loader`, `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-environment-community` |
 | `REF-11` | Public YAML documentation/comment style for runtime tuning assets | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-camera-tracking/assets/flow.gesture_detection.yaml`, `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-camera-tracking/assets/boxing.gesture_detection.yaml`, `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-camera-tracking/assets/flow.testbed_debug.yaml`, `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-camera-tracking/assets/boxing.testbed_debug.yaml` |
 | `REF-12` | Proposed first-class normalized body-grid pose contract | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/.plans/2026-08-02-normalized-body-grid-pose-contract.md` |
+| `REF-13` | Derrick screenshot of gameplay runner testbed startup warnings/errors | `/home/derrick/.openclaw/workspace/.temp/nerve-uploads/2026/08/10/image-4f11017b.png` |
 
 ---
 
@@ -438,11 +439,35 @@ Validation passed: GodotEnv sync, vendor runtime prep (`python3 scripts/prepare_
 
 ---
 
+### Task 8: Fix Gameplay Runner Testbed Startup Warnings and Errors
+
+**Bead ID:** `aerobeat-gameplay-runner-3yf`
+**SubAgent:** `primary` (for `coder` workflow role)
+**Role:** `coder`
+**References:** `REF-01`, `REF-13`
+**Prompt:** Claim bead `aerobeat-gameplay-runner-3yf` on start. Read the runner README before touching the repo. Fix the startup warnings/errors Derrick reported after opening the gameplay runner testbed, using `REF-13` as the screenshot source. The parse errors show `aerobeat-tool-camera-tracking` preloads `res://addons/aerobeat-tool-camera-recording/src/manifest/SessionManifestV1.gd`, `src/validation/SavedSessionValidator.gd`, and `src/pose/PoseFrameRecord.gd`, but the runner `.testbed` does not restore `aerobeat-tool-camera-recording`. Make the source-owned dependency/import fix, not a generated `/addons/` edit. Investigate the GUT invalid UID fallback warnings too: fix them in the owning source if appropriate, or document why they remain an accepted third-party/vendor exception. Rerun GodotEnv sync, fresh Flow and Boxing gameplay runner testbed opens with editor/runtime log inspection, relevant GUT/import checks, class-name scan, and `git diff --check`. Update this plan and bead notes with changed files and validation evidence. Commit and push when the fix is complete. Leave parent bead `aerobeat-gameplay-runner-an1` open unless the complete manual/high-fidelity gate passes.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed/`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.plans/`
+
+**Files Created/Deleted/Modified:**
+- `.testbed/addons.jsonc` - adds the missing local symlink-backed `aerobeat-tool-camera-recording` testbed dependency required by `aerobeat-tool-camera-tracking` replay backend preloads.
+- `.plans/2026-08-02-playable-flow-boxing-testbeds.md` - records Task 8 implementation, validation output, and accepted third-party/vendor exceptions.
+
+**Status:** ✅ Implemented
+
+**Results:** The runner-owned startup parse errors are fixed. `aerobeat-tool-camera-tracking` preloads `SessionManifestV1.gd`, `SavedSessionValidator.gd`, and `PoseFrameRecord.gd` from `res://addons/aerobeat-tool-camera-recording`; the runner `.testbed/addons.jsonc` now restores `aerobeat-tool-camera-recording` from the local sibling repo using the same symlink-backed manifest style as the other AeroBeat testbed dependencies. After `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo .testbed --install --scrub-uids`, Godot import registered `SessionManifestV1`, `PoseFrameRecord`, `SavedSessionValidator`, and `CameraRecordingManager`, and the prior camera-tracking preload/parse errors did not recur.
+
+Validation passed: GodotEnv sync, headless import smoke, runner full GUT (`20` tests, `206` assertions), fresh non-headless Flow scene open with clean normal Godot/Vulkan output, fresh non-headless Boxing scene open with clean normal Godot/Vulkan output, class-name scan (`0` collisions; blocker=0, warn_embedded_overlap=0, warn_root_nonruntime=0, info_hidden_testbed=0), and `git diff --check`. Accepted exceptions: headless import still reports third-party `aerobeat-vendor-godot-unit-test` invalid UID fallback warnings for GUT editor UI scenes and a Godot ObjectDB import-exit leak warning. The GUT UID warnings are vendor-owned, fall back to valid text paths inside the third-party GUT addon, do not appear in fresh Flow/Boxing runtime opens, and are not hiding runner/tool parse errors after the camera-recording dependency restore. `aerobeat-gameplay-runner-an1` remains open because the complete live/manual session gate still needs human-observed calibration, playback, overlays, audio/gameplay sync, hits/misses, recalibration, completion summary, environment display, and first-person cell observation.
+
+---
+
 ## Final Results
 
 **Status:** ❌ Blocked / Waiting on Manual Test
 
-**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is committed and pushed, coder follow-up fixes for the static QA blockers are committed and pushed, and the static/headless QA retry passed. The stale runner camera/replay startup blocker was addressed by Task 4 in commit `987d1bd`; Task 5 QA retry passed at `c550f76`; Task 6 audit confirmed the code and runtime-open gates were clean but blocked final closure on live/manual proof. Task 7 fixed the later typed target and replay provider registration blockers in commits `0ff2522` and `3a12f49`, and recreated high-fidelity replay/song validation now passes for Flow and Boxing. Derrick confirmed the next step is manual testing and feedback in the next AeroBeat session. Environment-loader splat display remains tracked as environment-owned follow-up `aerobeat-tool-environment-1ds`.
+**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is committed and pushed, coder follow-up fixes for the static QA blockers are committed and pushed, and the static/headless QA retry passed. The stale runner camera/replay startup blocker was addressed by Task 4 in commit `987d1bd`; Task 5 QA retry passed at `c550f76`; Task 6 audit confirmed the code and runtime-open gates were clean but blocked final closure on live/manual proof. Task 7 fixed the later typed target and replay provider registration blockers in commits `0ff2522` and `3a12f49`, and recreated high-fidelity replay/song validation now passes for Flow and Boxing. Task 8 fixed the startup parse errors in the gameplay runner testbed by restoring the missing `aerobeat-tool-camera-recording` dependency required by `aerobeat-tool-camera-tracking` replay backends; fresh Flow and Boxing opens are clean. Derrick confirmed the next step is manual testing and feedback in the next AeroBeat session. Environment-loader splat display remains tracked as environment-owned follow-up `aerobeat-tool-environment-1ds`.
 
 **Reference Check:** Subagent reviews completed against referenced repos. The final readiness audit passed after freeze edits and closed `aerobeat-gameplay-runner-7l8`.
 
