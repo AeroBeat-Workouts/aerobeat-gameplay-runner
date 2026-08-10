@@ -218,24 +218,43 @@ Fixture access evidence:
 **Files Created/Deleted/Modified:**
 - `.plans/2026-08-10-testbed-song-environment-assets.md`
 
-**Status:** ⏳ Pending
+**Status:** ✅ Complete
 
-**Results:** Pending.
+**Results:** Audit passed. Cookie sync was intentionally not run by this subagent; the orchestrator owns that post-audit step for this slice.
+
+Independent audit evidence:
+
+- Reviewed the active plan, Beads state, and commits `a111d62` and `a635c5d`.
+- Verified the copied song package YAML/chart files match the selected source refs byte-for-byte with `sha256sum`:
+  - `../aerobeat-content-core/fixtures/song_package_yaml_valid_splat_with_preview_audio/`
+  - `../aerobeat-content-core/fixtures/beatsaver_regression_pool/{226e,29be2,3d44b,47fb6}/`
+- Verified the copied environment media files match the selected source refs byte-for-byte with `sha256sum`:
+  - `../aerobeat-environment-community/.testbed/assets/images/perfect-hue-may-14-2026/perfect-hue-may-14-2026.png`
+  - `../aerobeat-environment-community/.testbed/assets/videos/calm_blue_sea_1/calm_blue_sea_1.ogv`
+  - `../aerobeat-environment-community/.testbed/assets/models/alien-moon-icescape/{alien-moon-icescape.glb,alien-moon-icescape.config.yaml,alien-moon-icescape_0.png}`
+  - `../aerobeat-environment-community/.testbed/assets/splats/countryside-farm/countryside-farm.compressed.ply`
+- Verified the runner-owned environment YAML path rewrites against `../aerobeat-environment-loader/.testbed/fixtures/workout_yaml_valid_all_kinds/environments/*.yaml`: image/video/splat now point at local `../media/...` resources and omit non-committed configs; GLB points at the local copied `alien-moon-icescape` GLB/config pair.
+- Verified every `resourcePath` and `configPath` in `.testbed/assets/environments/workout_yaml_valid_all_kinds/environments/*.yaml` resolves to a runner-local file under `.testbed/assets/environments/workout_yaml_valid_all_kinds/media/`.
+- `godot --headless --path .testbed --import > /tmp/aerobeat_gameplay_runner_audit_import.log 2>&1` passed with exit code 0.
+- Temporary highest-fidelity asset-access validation script run with `godot --headless --path .testbed --script res://tests/audit_asset_access_validation.gd > /tmp/aerobeat_gameplay_runner_audit_asset_access.log 2>&1` passed with exit code 0 and printed `AUDIT_ASSET_ACCESS_OK`; the temporary script and generated `.uid` were removed before completion.
+- `godot --headless --path .testbed --script addons/aerobeat-vendor-godot-unit-test/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit > /tmp/aerobeat_gameplay_runner_audit_gut.log 2>&1` passed with 20/20 tests and 206 assertions.
+- Fresh Godot app/runtime log at `$HOME/.local/share/godot/app_userdata/AeroBeat Gameplay Runner Testbed/logs/godot.log` was inspected after the audit runs.
+- Zero-noise scan command `rg -n "(?i)(warning|error|failed|missing|parse error|script error|import.*fail|can't|cannot)" /tmp/aerobeat_gameplay_runner_audit_import.log /tmp/aerobeat_gameplay_runner_audit_asset_access.log /tmp/aerobeat_gameplay_runner_audit_gut.log "$HOME/.local/share/godot/app_userdata/AeroBeat Gameplay Runner Testbed/logs/godot.log"` returned no matches.
 
 ---
 
 ## Final Results
 
-**Status:** ⚠️ Partial
+**Status:** ✅ Complete
 
-**What We Built:** Draft plan only. No assets have been copied yet.
+**What We Built:** Runner-local song and environment fixture assets under `.testbed/assets/`, with deterministic fixture roots and locally resolving environment media/config paths.
 
-**Reference Check:** Source assets located in `REF-05` through `REF-08`; execution still needs to select the curated subset and verify runner-local paths.
+**Reference Check:** Audit verified the copied assets against `REF-05` through `REF-08`, including byte-for-byte source checks for copied song YAML/chart files and environment media payloads. Runner-owned environment YAML rewrites are intentional and resolve locally.
 
-**Commits:** Pending.
+**Commits:** `a111d62` added the runner testbed asset fixtures; `a635c5d` recorded QA validation; audit completion is recorded in the follow-up plan/bead commit.
 
-**Lessons Learned:** The runner testbed asset folder already exists and is intentionally scoped to local showcase/test media, making it the right place for copied fixtures rather than reusable package assets.
+**Lessons Learned:** The runner testbed asset folder is the right package-local boundary for copied showcase/test fixtures. Environment loader source YAML may need runner-owned path normalization when copied away from the original polyrepo layout.
 
 ---
 
-*Completed on Pending*
+*Completed on 2026-08-10*
