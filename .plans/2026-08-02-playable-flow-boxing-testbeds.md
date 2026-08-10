@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-02  
 **Status:** Blocked  
-**Last Updated:** 2026-08-10 08:15 EDT
+**Last Updated:** 2026-08-10 08:24 EDT
 **Blocked Reason:** Task 8 fixed the runner-owned startup parse errors by restoring the missing camera-recording testbed dependency; final closure remains blocked on `aerobeat-gameplay-runner-an1` until Derrick manually observes a real playable session proving calibration/playback, overlays, audio/gameplay sync, hits/misses, recalibration, completion summary, environment display, and first-person cells `0/3/8/11`. Environment-owned splat-display follow-up remains tracked by `aerobeat-tool-environment-1ds`.
 **Agent:** pico
 
@@ -496,14 +496,18 @@ Targeted log inspection found no `SessionManifestV1`, `SavedSessionValidator`, `
 **Prompt:** Claim bead `aerobeat-gameplay-runner-bvw` on start after `aerobeat-gameplay-runner-6xb` closes. Read the runner README before touching the repo. Independently audit the startup warning/error cleanup against the bead, plan, commit diff, dependency manifest, validation evidence, and repo status. Close only if startup parse errors are fixed without generated addon edits and remaining warnings are accepted/source-owned. Update plan/beads and push Beads as needed. Leave `aerobeat-gameplay-runner-an1` open unless the full manual/high-fidelity gate passes.
 
 **Folders Created/Deleted/Modified:**
-- Pending
+- `.plans/`
 
 **Files Created/Deleted/Modified:**
-- Pending
+- `.plans/2026-08-02-playable-flow-boxing-testbeds.md` - records Task 10 audit evidence and pass decision.
 
-**Status:** ⏳ Pending
+**Status:** ✅ Audit Passed
 
-**Results:** Pending.
+**Results:** Audit passed at HEAD after QA commit `2287dd1`. Required startup was completed: README was read first, `bd prime` was run, bead `aerobeat-gameplay-runner-bvw` was claimed, and plan Tasks 8/9/10 plus beads `aerobeat-gameplay-runner-3yf` and `aerobeat-gameplay-runner-6xb` were reviewed. Repo status was clean and tracking `origin/main` with no ahead/behind markers. `git show --stat 682aa90` shows the source fix touched only `.testbed/addons.jsonc` and this plan; `git show --stat 2287dd1` shows QA evidence touched only this plan.
+
+The fix is appropriate for runner ownership: `.testbed/addons.jsonc` restores `aerobeat-tool-camera-recording` from the local sibling repo with `url: "../../aerobeat-tool-camera-recording"`, `source: "symlink"`, and `subfolder: "/"`. No generated addon files are tracked (`git ls-files .testbed/addons` returned empty). The installed symlink exposes the screenshot-missing preload targets required by `aerobeat-tool-camera-tracking`: `SessionManifestV1.gd`, `SavedSessionValidator.gd`, and `PoseFrameRecord.gd`; targeted search confirmed `SessionManifestReplayBackend.gd` and `SavedSessionReplayBackend.gd` preload those exact paths.
+
+QA evidence is sufficient for the startup cleanup scope. Task 9 and bead `aerobeat-gameplay-runner-6xb` record passing GodotEnv sync, headless import, full runner GUT (`4` scripts, `20` tests, `206` assertions), fresh non-headless Flow and Boxing opens, class-name scan with `0` collisions, and `git diff --check`. QA targeted log inspection found no `SessionManifestV1`, `SavedSessionValidator`, `PoseFrameRecord`, camera-tracking preload, parse, script, runner, or tool errors. The remaining GUT invalid UID fallback lines and Godot ObjectDB import-exit leak warning are accepted third-party/vendor/import-exit noise, do not appear in fresh Flow/Boxing runtime opens, and are not hiding the reported startup errors. `git diff --check` passed during audit. Bead `aerobeat-gameplay-runner-bvw` may close; parent `aerobeat-gameplay-runner-an1` remains open because the full human-observed manual/high-fidelity gate has not passed.
 
 ---
 
