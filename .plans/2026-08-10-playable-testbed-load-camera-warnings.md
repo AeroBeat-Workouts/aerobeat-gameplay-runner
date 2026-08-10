@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-10  
 **Status:** In Progress  
-**Last Updated:** 2026-08-10 15:26 EDT  
+**Last Updated:** 2026-08-10 16:05 EDT  
 **Blocked Reason:** None  
 **Agent:** pico
 
@@ -105,15 +105,88 @@ Because this touches Godot runtime scenes, validation must include a fresh open 
 **Prompt:** Use `primary` as the coder role. Read the README for every owning source repo before edits. Claim bead `aerobeat-gameplay-runner-2sk` on start with `bd update aerobeat-gameplay-runner-2sk --claim`. Fix the source-owned Godot reload warnings visible from the runner playable scene, including duplicate global-class preload constant names, untyped loop variables where practical, unused locals/members, shadowed `visible`, integer division, and incompatible ternary typing. Edit only owning source repos, refresh runner addon state with `/workspace/scripts/godotenv-sync`, and keep generated addon copies out of source commits except via normal sync state when required. Run relevant repo tests/imports and commit/push all durable source repo changes before handoff.
 
 **Folders Created/Deleted/Modified:**
-- Source repo folders determined by research.
-- Runner `.testbed/addons/` via canonical sync only if required.
+- `../aerobeat-content-core/validators/`, `../aerobeat-content-core/tests/`
+- `../aerobeat-environment-core/src/contracts/`
+- `../aerobeat-environment-loader/src/`, `../aerobeat-environment-loader/.testbed/tests/`
+- `../aerobeat-mode-core/src/data_types/`
+- `../aerobeat-mode-boxing/src/`
+- `../aerobeat-mode-flow/src/`
+- `../aerobeat-vendor-gdgs/src/importers/decoders/`, `../aerobeat-vendor-gdgs/src/runtime/render/`
+- Runner `.testbed/addons/` refreshed with `/home/derrick/.openclaw/workspace/scripts/godotenv-sync`; no tracked runner sync changes.
 
 **Files Created/Deleted/Modified:**
-- Source-owned warning files determined by research.
+- `../aerobeat-content-core/validators/content_package_validator.gd`
+- `../aerobeat-content-core/tests/test_beatsaver_regression_fixtures.gd`
+- `../aerobeat-content-core/tests/test_chart_event_contract.gd`
+- `../aerobeat-content-core/tests/test_content_manifest_contract.gd`
+- `../aerobeat-content-core/tests/test_content_mode_contract.gd`
+- `../aerobeat-content-core/tests/test_content_reference_validation.gd`
+- `../aerobeat-content-core/tests/test_environment_contract.gd`
+- `../aerobeat-content-core/tests/test_legacy_package_contract.gd`
+- `../aerobeat-content-core/tests/test_song_package_yaml_contract.gd`
+- `../aerobeat-content-core/tests/test_song_preview_audio_contract.gd`
+- `../aerobeat-content-core/tests/test_song_timing_validation.gd`
+- `../aerobeat-environment-core/src/contracts/data_types/environment_error.gd`
+- `../aerobeat-environment-core/src/contracts/data_types/environment_media_config.gd`
+- `../aerobeat-environment-core/src/contracts/data_types/environment_operation.gd`
+- `../aerobeat-environment-core/src/contracts/data_types/environment_progress.gd`
+- `../aerobeat-environment-core/src/contracts/data_types/environment_request.gd`
+- `../aerobeat-environment-core/src/contracts/data_types/environment_result.gd`
+- `../aerobeat-environment-core/src/contracts/interfaces/environment_fulfillment.gd`
+- `../aerobeat-environment-core/src/contracts/interfaces/environment_kind_handler.gd`
+- `../aerobeat-environment-core/src/contracts/validators/environment_request_validator.gd`
+- `../aerobeat-environment-loader/src/AeroEnvironmentLoader.gd`
+- `../aerobeat-environment-loader/src/AeroWorkoutYamlEnvironmentBridge.gd`
+- `../aerobeat-environment-loader/.testbed/tests/test_AeroEnvironmentLoader.gd`
+- `../aerobeat-environment-loader/.testbed/tests/test_example.gd`
+- `../aerobeat-mode-core/src/data_types/mode_descriptor.gd`
+- `../aerobeat-mode-core/src/data_types/mode_fixture_case.gd`
+- `../aerobeat-mode-core/src/data_types/mode_run_fragment.gd`
+- `../aerobeat-mode-core/src/data_types/mode_tick_frame.gd`
+- `../aerobeat-mode-boxing/src/boxing_mode_runner.gd`
+- `../aerobeat-mode-flow/src/flow_mode_runner.gd`
+- `../aerobeat-vendor-gdgs/src/importers/decoders/compressed_ply_decoder.gd`
+- `../aerobeat-vendor-gdgs/src/importers/decoders/sog_decoder.gd`
+- `../aerobeat-vendor-gdgs/src/runtime/render/gaussian_scene_registry.gd`
 
-**Status:** ⏳ Pending
+**Status:** ✅ Complete
 
-**Results:** Pending.
+**Results:** Source-owned warning cleanup completed and pushed 2026-08-10 16:05 EDT. Changes made:
+- Removed duplicate global-class preload constant warnings by renaming script preloads in content core, environment core, Boxing, and Flow.
+- Added static types to reload-visible generic iterators in content, environment loader, mode core, Boxing, and Flow.
+- Fixed integer-division warnings in environment loader splat estimates and GDGS compressed/sog decoder indexing.
+- Renamed GDGS `NodeEntry.visible` state to `is_visible` to avoid shadowing engine visibility.
+- Made environment-loader device detection optional without hardcoded missing-script load noise when no `AeroDeviceDetection` autoload/addon exists.
+- Added descriptor-relative environment `resourcePath`/`configPath` resolution with package-root fallback, plus focused loader coverage.
+- Updated environment-loader manifest test expectations for the already-committed `aerobeat-tool-headless-manager` dependency so the repo-local suite remains exact and passing.
+
+**Commits Pushed:**
+- `aerobeat-content-core` `86ec83a` - Clean content reload warnings
+- `aerobeat-environment-core` `de2e66b` - Clean environment contract reload warnings
+- `aerobeat-environment-loader` `27db7a9` - Clean environment loader warnings
+- `aerobeat-mode-core` `89087c4` - Clean mode core reload warnings
+- `aerobeat-mode-boxing` `64e85e1` - Clean boxing mode reload warnings
+- `aerobeat-mode-flow` `1a40756` - Clean flow mode reload warnings
+- `aerobeat-vendor-gdgs` `f3ffe4d` - Clean gdgs reload warnings
+
+**Validation:**
+- Source repo imports/tests:
+  - `aerobeat-content-core`: import passed; `godot --headless --path .testbed --script res://../tests/run_contract_tests.gd` passed all contract cases.
+  - `aerobeat-environment-core`: import passed; GUT passed 17/17 tests.
+  - `aerobeat-environment-loader`: import passed; GUT passed 42/42 tests, including new descriptor-relative path coverage.
+  - `aerobeat-mode-core`: import passed; GUT passed 5/5 tests.
+  - `aerobeat-mode-boxing`: import passed; GUT passed 7/7 tests.
+  - `aerobeat-mode-flow`: import passed; GUT passed 9/9 tests.
+  - `aerobeat-vendor-gdgs`: import passed in its `.testbed`.
+- Runner dependency refresh: `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo /home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner` completed `ok`; no tracked runner addon changes.
+- Runner GUT: `godot --headless --path .testbed --script addons/aerobeat-vendor-godot-unit-test/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit` passed 25/25 tests.
+- Runner fresh import: `godot --headless --path .testbed --import` passed.
+- Runner scene logs:
+  - `godot --headless --path .testbed --quit-after 2 res://scenes/flow_playable_testbed.tscn` passed.
+  - `godot --headless --path .testbed --quit-after 2 res://scenes/boxing_playable_testbed.tscn` passed.
+  - Final log scan found no `WARNING`, `ERROR`, `SCRIPT ERROR`, `Parse Error`, leak/orphan/failed noise in the final source and runner validation logs.
+
+**Remaining source-owned warnings:** None found in the runner playable-scene validation path.
 
 ---
 
