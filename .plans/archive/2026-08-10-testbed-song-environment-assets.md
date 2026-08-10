@@ -1,8 +1,8 @@
 # AeroBeat Gameplay Runner Testbed Song And Environment Assets
 
 **Date:** 2026-08-10  
-**Status:** In Progress  
-**Last Updated:** 2026-08-10 11:55 EDT  
+**Status:** Complete  
+**Last Updated:** 2026-08-10 12:04 EDT  
 **Blocked Reason:** None  
 **Agent:** pico
 
@@ -220,7 +220,7 @@ Fixture access evidence:
 
 **Status:** ✅ Complete
 
-**Results:** Audit passed. Cookie sync was intentionally not run by this subagent; the orchestrator owns that post-audit step for this slice.
+**Results:** Audit passed. Cookie sync was intentionally not run by this subagent; the orchestrator completed that post-audit step after parent review.
 
 Independent audit evidence:
 
@@ -241,17 +241,25 @@ Independent audit evidence:
 - Fresh Godot app/runtime log at `$HOME/.local/share/godot/app_userdata/AeroBeat Gameplay Runner Testbed/logs/godot.log` was inspected after the audit runs.
 - Zero-noise scan command `rg -n "(?i)(warning|error|failed|missing|parse error|script error|import.*fail|can't|cannot)" /tmp/aerobeat_gameplay_runner_audit_import.log /tmp/aerobeat_gameplay_runner_audit_asset_access.log /tmp/aerobeat_gameplay_runner_audit_gut.log "$HOME/.local/share/godot/app_userdata/AeroBeat Gameplay Runner Testbed/logs/godot.log"` returned no matches.
 
+Post-audit Cookie/local AeroBeat sync evidence:
+
+- Initial bare `git-sync --all-aerobeat` was not available on the shell `PATH`, so the orchestrator used the explicit wrapper path `/home/derrick/.openclaw/workspace/scripts/git-sync --all-aerobeat`.
+- `/home/derrick/.openclaw/workspace/scripts/git-sync --all-aerobeat` completed with `68 ok, 0 failed`. The sync fast-forwarded the local AeroBeat holder where needed and left `aerobeat-gameplay-runner` clean at `main...origin/main`.
+- `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --all-aerobeat --install --scrub-uids` completed with `64 ok, 0 failed`.
+- The local `node-sync` wrapper was inspected and is Apex-scoped only, so it was not applicable to this AeroBeat slice.
+- Verified the relevant runner/source checkouts are clean and at `main...origin/main`: `aerobeat-gameplay-runner`, `aerobeat-content-core`, `aerobeat-environment-loader`, `aerobeat-environment-community`, and `aerobeat-vendor-godot-unit-test`.
+
 ---
 
 ## Final Results
 
 **Status:** ✅ Complete
 
-**What We Built:** Runner-local song and environment fixture assets under `.testbed/assets/`, with deterministic fixture roots and locally resolving environment media/config paths.
+**What We Built:** Runner-local song and environment fixture assets under `.testbed/assets/`, with deterministic fixture roots and locally resolving environment media/config paths. Post-audit AeroBeat sync also completed cleanly.
 
 **Reference Check:** Audit verified the copied assets against `REF-05` through `REF-08`, including byte-for-byte source checks for copied song YAML/chart files and environment media payloads. Runner-owned environment YAML rewrites are intentional and resolve locally.
 
-**Commits:** `a111d62` added the runner testbed asset fixtures; `a635c5d` recorded QA validation; audit completion is recorded in the follow-up plan/bead commit.
+**Commits:** `a111d62` added the runner testbed asset fixtures; `a635c5d` recorded QA validation; `944e18a` recorded the audit pass; final plan archive/sync evidence is recorded in the follow-up documentation commit.
 
 **Lessons Learned:** The runner testbed asset folder is the right package-local boundary for copied showcase/test fixtures. Environment loader source YAML may need runner-owned path normalization when copied away from the original polyrepo layout.
 
