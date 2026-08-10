@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-02  
 **Status:** Blocked  
-**Last Updated:** 2026-08-02 21:37 EDT
-**Blocked Reason:** Final manual/high-fidelity closure is blocked until Derrick manually tests a real playable session and provides feedback proving the live/replay camera feed, FileDialog-selected fixtures, T-pose calibration, audio/gameplay, hit/miss, recalibration, completion, overlays, and cell-placement observations. Environment-owned splat-display follow-up remains tracked by `aerobeat-tool-environment-1ds`.
+**Last Updated:** 2026-08-10 07:08 EDT
+**Blocked Reason:** Task 7 fixed the static replay startup blockers and closed `aerobeat-gameplay-runner-eqo`; final closure remains blocked on `aerobeat-gameplay-runner-an1` until Derrick manually observes a real playable session proving calibration/playback, overlays, audio/gameplay sync, hits/misses, recalibration, completion summary, environment display, and first-person cells `0/3/8/11`. Environment-owned splat-display follow-up remains tracked by `aerobeat-tool-environment-1ds`.
 **Agent:** pico
 
 ---
@@ -442,7 +442,7 @@ Validation passed: GodotEnv sync, vendor runtime prep (`python3 scripts/prepare_
 
 **Status:** ❌ Blocked / Waiting on Manual Test
 
-**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is committed and pushed, coder follow-up fixes for the static QA blockers are committed and pushed, and the static/headless QA retry passed. The stale runner camera/replay startup blocker was addressed by Task 4 in commit `987d1bd`; Task 5 QA retry passed at `c550f76`; Task 6 audit confirmed the code and runtime-open gates are clean but blocked final closure on live/manual proof. Derrick confirmed the next step is manual testing and feedback in the next AeroBeat session. Environment-loader splat display remains tracked as environment-owned follow-up `aerobeat-tool-environment-1ds`.
+**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is committed and pushed, coder follow-up fixes for the static QA blockers are committed and pushed, and the static/headless QA retry passed. The stale runner camera/replay startup blocker was addressed by Task 4 in commit `987d1bd`; Task 5 QA retry passed at `c550f76`; Task 6 audit confirmed the code and runtime-open gates were clean but blocked final closure on live/manual proof. Task 7 fixed the later typed target and replay provider registration blockers in commits `0ff2522` and `3a12f49`, and recreated high-fidelity replay/song validation now passes for Flow and Boxing. Derrick confirmed the next step is manual testing and feedback in the next AeroBeat session. Environment-loader splat display remains tracked as environment-owned follow-up `aerobeat-tool-environment-1ds`.
 
 **Reference Check:** Subagent reviews completed against referenced repos. The final readiness audit passed after freeze edits and closed `aerobeat-gameplay-runner-7l8`.
 
@@ -457,9 +457,11 @@ Validation passed: GodotEnv sync, vendor runtime prep (`python3 scripts/prepare_
 - `c550f76` - Record camera source QA retry
 - `2b59ee5` - Record camera source QA plan update
 - `a0ffe8b` - Record final playable testbed audit blocker
+- `0ff2522` - Fix playable replay startup blockers
+- `3a12f49` - Accept boxing punch payloads in input manager
 
 **Lessons Learned:** Static/headless coverage can prove the target mapping and overlay toggle regressions. Manual runtime validation needs source selection before provider startup, then a real playable session with selected camera/replay and fixtures to prove audio, calibration, overlays, and gameplay behavior. Environment-owned display gaps should stay separate from runner-owned camera/replay flow.
 
 ---
 
-*Blocked on manual test feedback as of 2026-08-02*
+*Blocked on manual test feedback as of 2026-08-10*
