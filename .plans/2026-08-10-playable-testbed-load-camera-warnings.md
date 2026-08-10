@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-10  
 **Status:** In Progress  
-**Last Updated:** 2026-08-10 15:57 EDT  
-**Blocked Reason:** Task 4 QA is blocked/failed on live-camera hardware and runtime noise; no `/dev/video*` devices are available, and camera provider registration/unregistration produced unexpected error noise during the playable workflow probe.
+**Last Updated:** 2026-08-10 16:06 EDT  
+**Blocked Reason:** Task 4 QA still needs retry on real live-camera hardware because no `/dev/video*` devices are available on this host. Task 4.5 fixed and validated the no-camera provider registration/unregistration cleanup path with zero unexpected warning/error/leak noise.
 **Agent:** pico
 
 ---
@@ -222,6 +222,51 @@ Because this touches Godot runtime scenes, validation must include a fresh open 
   - `godot --path .testbed --quit-after 2 res://scenes/flow_playable_testbed.tscn > /tmp/aerobeat-runner-qa-flow-runtime.log 2>&1` exited 0; noise scan found no warning/error matches.
   - `godot --path .testbed --quit-after 2 res://scenes/boxing_playable_testbed.tscn > /tmp/aerobeat-runner-qa-boxing-runtime.log 2>&1` exited 0; noise scan found no warning/error matches.
 - Editor-control stop evidence is missing because the Godot editor-control MCP tool was not available in this subagent session; runtime scene launch/quit evidence is included above, but this does not satisfy the requested editor play/stop workflow.
+
+---
+
+### Task 4.5: Fix Input Provider Cleanup Noise
+
+**Bead ID:** `aerobeat-gameplay-runner-cng`  
+**SubAgent:** `primary`  
+**Role:** `coder`  
+**References:** `REF-02`, `REF-03`, `REF-05`  
+**Prompt:** Use `primary` as the coder role. Read both the runner README and `../aerobeat-input-core/README.md` before touching either repo. Claim bead `aerobeat-gameplay-runner-cng` on start with `bd update aerobeat-gameplay-runner-cng --claim`. Fix the source-owned `aerobeat-input-core` cleanup path where `InputManager._disconnect_provider_signals()` emits repeated `Cannot disconnect from '<signal>': the provided callable is null` from `src/input_manager.gd:507` during runner live-camera provider unregister. Keep durable edits in `../aerobeat-input-core`; do not edit generated runner `.testbed/addons/` directly. Add focused input-core tests for provider register/unregister signal cleanup where practical, run input-core validation, sync runner addon state with `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo /home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner`, and verify the runner live-camera registration/unregistration probe exits with zero unexpected warning/error/leak noise when no `/dev/video*` devices are present. Commit and push all durable source/plan/bead changes before handoff unless blocked.
+
+**Folders Created/Deleted/Modified:**
+- `../aerobeat-input-core/src/`
+- `../aerobeat-input-core/.testbed/tests/`
+- `.testbed/scripts/`
+- `.plans/`
+
+**Files Created/Deleted/Modified:**
+- `../aerobeat-input-core/src/input_manager.gd`
+- `../aerobeat-input-core/.testbed/tests/unit/test_input_manager_provider_identity.gd`
+- `.testbed/scripts/playable_testbed_harness.gd`
+- `.plans/2026-08-10-playable-testbed-load-camera-warnings.md`
+
+**Status:** ✅ Complete
+
+**Results:** Cleanup fix completed and pushed 2026-08-10 16:06 EDT. Changes made:
+- `aerobeat-input-core` `InputManager` now records the concrete provider signal/callable pairs it connects and disconnects only those callables during unregister, avoiding the previous null-callable `provider.disconnect(sig["name"], Callable())` path.
+- Added focused input-core GUT coverage proving base provider signals and optional gameplay/body-cell provider signals are disconnected on unregister and no longer proxy through the manager after unregister.
+- Runner playable harness now keeps the created live-camera input provider as a scene-owned child and queues it for free after unregister, eliminating the provider-node/resource leak exposed by the no-camera workflow probe.
+- Runner addon state refreshed with `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo /home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner`; sync completed `ok`.
+
+**Commits Pushed:**
+- `aerobeat-input-core` `728d361` - Fix provider signal cleanup
+- `aerobeat-gameplay-runner` `b39fe33` - Clean live camera provider unregister noise
+
+**Validation:**
+- No camera hardware available: `find /dev -maxdepth 2 \( -name 'video*' -o -name 'media*' \) -print` returned no devices; `ls -l /dev/video*` returned `No such file or directory`.
+- Input-core import: `godot --headless --path .testbed --import > /tmp/aerobeat-input-core-cng-import.log 2>&1` exited 0; noise scan found no `WARNING`, `SCRIPT ERROR`, `Parse Error`, ObjectDB/leak/resource, or `Cannot disconnect` matches.
+- Input-core GUT: `godot --headless --path .testbed --script addons/aerobeat-vendor-godot-unit-test/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit > /tmp/aerobeat-input-core-cng-gut.log 2>&1` exited 0; 42/42 tests passed. The suite still contains its intentional expected `AeroInputProvider` push_error assertion, but no warning/leak/null-disconnect noise was found.
+- Runner live-camera cleanup probe: temporary `res://qa_live_camera_cleanup_probe.gd` loaded both `flow_playable_testbed.tscn` and `boxing_playable_testbed.tscn`, selected live camera `0`, called `_ensure_input_provider_registered()`, then called `_reset_camera_provider_registration()` through the normal scene path. `godot --path .testbed --script res://qa_live_camera_cleanup_probe.gd > /tmp/aerobeat-runner-live-camera-cleanup-probe.log 2>&1` exited 0; both scenes reported `registered=true`; noise scan found no `WARNING`, `ERROR`, `SCRIPT ERROR`, `Parse Error`, ObjectDB/leak/resource, or `Cannot disconnect` matches. The temporary probe file was removed after validation.
+- Runner import: `godot --headless --path .testbed --import > /tmp/aerobeat-runner-cng-import.log 2>&1` exited 0; noise scan found no warning/error/leak/null-disconnect matches.
+- Runner GUT: `godot --headless --path .testbed --script addons/aerobeat-vendor-godot-unit-test/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit > /tmp/aerobeat-runner-cng-gut.log 2>&1` exited 0; 25/25 tests passed; noise scan found no warning/error/leak/null-disconnect matches.
+- Runner scene smokes: `godot --path .testbed --quit-after 2 res://scenes/flow_playable_testbed.tscn > /tmp/aerobeat-runner-cng-flow-runtime.log 2>&1` and `godot --path .testbed --quit-after 2 res://scenes/boxing_playable_testbed.tscn > /tmp/aerobeat-runner-cng-boxing-runtime.log 2>&1` exited 0; both log scans found no warning/error/leak/null-disconnect matches.
+
+**Remaining QA limitation:** Real camera validation remains impossible on this host without `/dev/video*`; leave QA bead `aerobeat-gameplay-runner-0rg` open for hardware retry.
 
 ---
 

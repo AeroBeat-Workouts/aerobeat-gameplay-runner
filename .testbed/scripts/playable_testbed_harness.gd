@@ -29,6 +29,7 @@ var _clock: RefCounted = null
 var _input_stream: RefCounted = null
 var _input_manager: Node = null
 var _camera_source: RefCounted = null
+var _camera_input_provider: Node = null
 var _camera_provider_registered := false
 var _audio_loader: Node = null
 var _environment_adapter: Node = null
@@ -229,6 +230,9 @@ func _reset_camera_provider_registration() -> void:
 	if _camera_provider_registered and _input_manager != null and _input_manager.has_method("unregister_provider"):
 		_input_manager.unregister_provider("camera_tracking")
 	_camera_provider_registered = false
+	if _camera_input_provider != null and is_instance_valid(_camera_input_provider):
+		_camera_input_provider.queue_free()
+	_camera_input_provider = null
 
 func _ensure_input_provider_registered() -> bool:
 	if _input_manager == null:
@@ -245,6 +249,8 @@ func _ensure_input_provider_registered() -> bool:
 	var settings: Dictionary = _camera_source.provider_settings()
 	var provider := CameraTrackingInputProviderScript.new()
 	provider.name = "CameraTrackingInputProvider"
+	_camera_input_provider = provider
+	add_child(provider)
 	var tracking_singleton := _prepare_camera_tracking_runtime(settings)
 	if tracking_singleton != null and provider.has_method("set_tracking_session") and tracking_singleton.has_method("get_tracking_session_if_ready"):
 		var tracking_session: Node = tracking_singleton.get_tracking_session_if_ready()
@@ -254,6 +260,8 @@ func _ensure_input_provider_registered() -> bool:
 		provider.set_selected_camera_device_id(String(settings.get("camera_source", "")))
 	if not _input_manager.register_provider(provider, settings):
 		_update_hud("Camera input provider unavailable for %s. %s" % [_camera_source.status_text(), _camera_tracking_diagnostics_text()])
+		_camera_input_provider.queue_free()
+		_camera_input_provider = null
 		return false
 	_camera_provider_registered = true
 	_update_hud("Camera input provider registered with %s. %s" % [_camera_source.status_text(), _camera_tracking_diagnostics_text()])
