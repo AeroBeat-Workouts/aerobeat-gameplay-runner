@@ -1,7 +1,7 @@
 extends RefCounted
 
 const ContentPackageValidator := preload("res://addons/aerobeat-content-core/validators/content_package_validator.gd")
-const SimpleYamlParser := preload("res://addons/aerobeat-content-core/validators/simple_yaml_parser.gd")
+const SimpleYamlParserScript := preload("res://addons/aerobeat-content-core/validators/simple_yaml_parser.gd")
 
 func load_package(package_path: String, requested_mode: String) -> Dictionary:
 	var package_dir := package_path
@@ -11,13 +11,25 @@ func load_package(package_path: String, requested_mode: String) -> Dictionary:
 	if validation != null and validation.has_method("is_valid") and not validation.is_valid():
 		return {"ok": false, "error": "content_core_validation_failed", "package_dir": package_dir}
 
-	var parser := SimpleYamlParser.new()
+	var parser := SimpleYamlParserScript.new()
 	var root: Variant = parser.parse_file(package_dir.path_join("song.package.yaml"))
 	if not root is Dictionary:
 		return {"ok": false, "error": "song_package_yaml_missing", "package_dir": package_dir}
+	var available_charts := available_chart_options(Dictionary(root))
 	var chart_descriptor := _first_chart_for_mode(Dictionary(root), requested_mode)
 	if chart_descriptor.is_empty():
-		return {"ok": false, "error": "chart_for_mode_missing", "mode": requested_mode, "package_dir": package_dir}
+		return {
+			"ok": false,
+			"error": "chart_for_mode_missing",
+			"mode": requested_mode,
+			"package_dir": package_dir,
+			"available_charts": available_charts,
+			"available_modes": available_modes(available_charts),
+			"message": "This package has %s charts, not %s. Open it in the matching playable scene." % [
+				chart_options_text(available_charts),
+				requested_mode,
+			],
+		}
 	var chart_path := package_dir.path_join(String(chart_descriptor.get("path", "")))
 	var chart: Variant = parser.parse_file(chart_path)
 	if not chart is Dictionary:
@@ -37,9 +49,48 @@ func load_package(package_path: String, requested_mode: String) -> Dictionary:
 		"chart_path": chart_path,
 		"chart_id": String(chart.get("chartId", chart_descriptor.get("chartId", ""))),
 		"mode": requested_mode,
+		"difficulty": String(chart_descriptor.get("difficulty", "")),
+		"available_charts": available_charts,
+		"available_modes": available_modes(available_charts),
 		"events": _events_for_chart(Dictionary(chart), requested_mode),
 		"audio_path": audio_path
 	}
+
+static func available_chart_options(root: Dictionary) -> Array[Dictionary]:
+	var options: Array[Dictionary] = []
+	for descriptor_variant in Array(root.get("charts", [])):
+		if not descriptor_variant is Dictionary:
+			continue
+		var descriptor := Dictionary(descriptor_variant)
+		var mode := String(descriptor.get("mode", "")).strip_edges()
+		var difficulty := String(descriptor.get("difficulty", "")).strip_edges()
+		if mode.is_empty():
+			continue
+		options.append({
+			"mode": mode,
+			"difficulty": difficulty,
+			"chart_id": String(descriptor.get("chartId", "")),
+			"path": String(descriptor.get("path", "")),
+		})
+	return options
+
+static func available_modes(options: Array[Dictionary]) -> Array[String]:
+	var modes: Array[String] = []
+	for option in options:
+		var mode := String(option.get("mode", "")).strip_edges()
+		if not mode.is_empty() and not modes.has(mode):
+			modes.append(mode)
+	return modes
+
+static func chart_options_text(options: Array[Dictionary]) -> String:
+	if options.is_empty():
+		return "no usable"
+	var labels: Array[String] = []
+	for option in options:
+		var mode := String(option.get("mode", "")).strip_edges()
+		var difficulty := String(option.get("difficulty", "")).strip_edges()
+		labels.append("%s/%s" % [mode, difficulty if not difficulty.is_empty() else "unspecified"])
+	return ", ".join(labels)
 
 func _first_chart_for_mode(root: Dictionary, requested_mode: String) -> Dictionary:
 	for descriptor in Array(root.get("charts", [])):

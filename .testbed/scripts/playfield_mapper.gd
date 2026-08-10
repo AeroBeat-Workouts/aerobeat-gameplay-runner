@@ -72,7 +72,7 @@ func is_fallback_scale() -> bool:
 
 func cell_to_row_col(cell_index: int) -> Vector2i:
 	var clamped := clampi(cell_index, 0, columns * rows - 1)
-	return Vector2i(clamped % columns, clamped / columns)
+	return Vector2i(clamped % columns, floori(float(clamped) / float(columns)))
 
 func cell_center_to_world(cell_index: int, z_override: Variant = null) -> Vector3:
 	var col_row := cell_to_row_col(cell_index)

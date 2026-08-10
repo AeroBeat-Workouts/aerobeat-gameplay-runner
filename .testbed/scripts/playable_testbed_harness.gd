@@ -35,7 +35,6 @@ var _environment_adapter: Node = null
 var _loaded_content := {}
 var _targets: Array[Dictionary] = []
 var _target_nodes := {}
-var _last_tick_msec := 0
 var _calibration_started_playback := false
 var _paused_for_recalibration := false
 var _overlay_visible_until_ms := 0
@@ -73,9 +72,6 @@ func _ready() -> void:
 	_update_hud("Choose camera source, song package, and environment, then T-pose to calibrate.")
 
 func _process(delta: float) -> void:
-	var now := Time.get_ticks_msec()
-	if _last_tick_msec == 0:
-		_last_tick_msec = now
 	_update_player_rig_from_nose()
 	_update_debug_markers()
 	if _session != null and _session.get_state() == GameplayRunState.RUNNING:
@@ -84,7 +80,6 @@ func _process(delta: float) -> void:
 		_update_targets(float(_clock.get_position_sec()))
 		if _session.get_state() == GameplayRunState.COMPLETED:
 			_finish_session()
-	_last_tick_msec = now
 
 func _setup_input() -> void:
 	_input_manager = InputManagerScript.new()
@@ -117,7 +112,7 @@ func _setup_dialogs() -> void:
 	)
 	_environment_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
 	_environment_dialog.access = FileDialog.ACCESS_FILESYSTEM
-	_environment_dialog.filters = PackedStringArray(["*.png,*.ogv,*.glb,*.compressed.ply ; AeroBeat environments"])
+	_environment_dialog.filters = PackedStringArray(["*.yaml,*.yml,*.png,*.ogv,*.glb,*.compressed.ply ; AeroBeat environments"])
 	_environment_dialog.file_selected.connect(func(path: String) -> void:
 		_environment_adapter.load_environment_file(path)
 	)
@@ -136,7 +131,7 @@ func _setup_dialogs() -> void:
 func _load_song(path: String) -> void:
 	_loaded_content = ContentLoader.new().load_package(path, mode_id)
 	if not bool(_loaded_content.get("ok", false)):
-		_update_hud("Song load failed: %s" % _loaded_content.get("error", "unknown"))
+		_update_hud("Song load failed: %s" % _song_load_error_text(_loaded_content))
 		return
 	_targets = dictionary_array(_loaded_content.get("events", []))
 	_build_target_nodes()
@@ -144,7 +139,9 @@ func _load_song(path: String) -> void:
 	if not audio_path.is_empty():
 		_audio_loader.load({"kind": "file", "path": audio_path}, String(_config.get("audio", {}).get("music_slot", "default")))
 	_load_hit_sfx()
-	_update_hud("Loaded %s chart with %d events. T-pose calibration starts playback." % [mode_id, _targets.size()])
+	var difficulty := String(_loaded_content.get("difficulty", "")).strip_edges()
+	var difficulty_text := " %s" % difficulty if not difficulty.is_empty() else ""
+	_update_hud("Loaded %s%s chart with %d events. T-pose calibration starts playback." % [mode_id, difficulty_text, _targets.size()])
 
 func _request_calibration() -> void:
 	if _session != null and _session.get_state() == GameplayRunState.RUNNING:
@@ -153,7 +150,7 @@ func _request_calibration() -> void:
 		return
 	if _input_manager != null and _input_manager.has_method("start_calibration"):
 		if not _input_manager.start_calibration():
-			_update_hud("Calibration request unavailable; camera provider may not be ready.")
+			_update_hud("Calibration request unavailable. %s" % _camera_tracking_diagnostics_text())
 
 func _on_calibration_started(_event: Dictionary) -> void:
 	if _session != null and _session.get_state() == GameplayRunState.RUNNING:
@@ -168,9 +165,9 @@ func _on_calibration_succeeded(_event: Dictionary) -> void:
 		_resume_after_recalibration()
 	_update_hud("Calibration succeeded.")
 
-func _on_calibration_failed(_event: Dictionary) -> void:
+func _on_calibration_failed(event: Dictionary) -> void:
 	_paused_for_recalibration = true
-	_update_hud("Calibration failed; audio/gameplay remain paused.")
+	_update_hud("Calibration failed: %s Audio/gameplay remain paused." % _camera_error_text(event))
 
 func _on_calibration_canceled(_event: Dictionary) -> void:
 	_paused_for_recalibration = true
@@ -206,7 +203,7 @@ func _resume_after_recalibration() -> void:
 	_paused_for_recalibration = false
 
 func _finish_session() -> void:
-	var result: RefCounted = _session.stop("complete")
+	_session.stop("complete")
 	var summary: Dictionary = _session.get_score_summary()
 	_audio_loader.stop(String(_config.get("audio", {}).get("music_slot", "default")))
 	_summary.text = "Complete  Hits: %d  Misses: %d  Score: %d" % [summary.get("hits", 0), summary.get("misses", 0), summary.get("score", 0)]
@@ -256,25 +253,29 @@ func _ensure_input_provider_registered() -> bool:
 	if provider.has_method("set_selected_camera_device_id"):
 		provider.set_selected_camera_device_id(String(settings.get("camera_source", "")))
 	if not _input_manager.register_provider(provider, settings):
-		_update_hud("Camera input provider unavailable for %s." % _camera_source.status_text())
+		_update_hud("Camera input provider unavailable for %s. %s" % [_camera_source.status_text(), _camera_tracking_diagnostics_text()])
 		return false
 	_camera_provider_registered = true
-	_update_hud("Camera input provider registered with %s." % _camera_source.status_text())
+	_update_hud("Camera input provider registered with %s. %s" % [_camera_source.status_text(), _camera_tracking_diagnostics_text()])
 	return true
 
 func _prepare_camera_tracking_runtime(settings: Dictionary) -> Node:
 	var tracking_singleton := get_node_or_null("/root/AeroCameraTracking")
 	if tracking_singleton == null:
+		_update_hud("AeroCameraTracking singleton unavailable; camera addon may not be enabled.")
 		return null
 	var runtime_config := _camera_tracking_runtime_config(settings)
 	var source: Dictionary = settings.get("source", {}) if settings.get("source", {}) is Dictionary else {}
 	var source_kind := String(source.get("kind", "")).strip_edges()
+	var started := false
 	if source_kind == CameraSourcePickerState.MODE_REPLAY and tracking_singleton.has_method("start_replay"):
-		tracking_singleton.start_replay(String(source.get("path", "")).strip_edges(), runtime_config)
+		started = bool(tracking_singleton.start_replay(String(source.get("path", "")).strip_edges(), runtime_config))
 	elif source_kind == CameraSourcePickerState.MODE_LIVE and tracking_singleton.has_method("start_live_camera"):
-		tracking_singleton.start_live_camera(String(source.get("camera_id", settings.get("camera_source", ""))).strip_edges(), runtime_config)
+		started = bool(tracking_singleton.start_live_camera(String(source.get("camera_id", settings.get("camera_source", ""))).strip_edges(), runtime_config))
 	elif tracking_singleton.has_method("start"):
-		tracking_singleton.start(runtime_config)
+		started = bool(tracking_singleton.start(runtime_config))
+	if not started:
+		_update_hud("AeroCameraTracking did not start. %s" % _camera_tracking_diagnostics_text(tracking_singleton))
 	return tracking_singleton
 
 func _camera_tracking_runtime_config(settings: Dictionary) -> Resource:
@@ -364,9 +365,9 @@ func _update_player_rig_from_nose() -> void:
 
 func _update_debug_markers() -> void:
 	var debug_config := _as_dict(_config.get("debug", {}))
-	var visible: bool = _target_regions.debug_pose_overlay_visible(debug_config, Time.get_ticks_msec(), _overlay_visible_until_ms)
-	_markers_root.visible = visible
-	if not visible or _input_manager == null:
+	var markers_visible: bool = _target_regions.debug_pose_overlay_visible(debug_config, Time.get_ticks_msec(), _overlay_visible_until_ms)
+	_markers_root.visible = markers_visible
+	if not markers_visible or _input_manager == null:
 		return
 	_set_marker("Nose", _input_manager.get_body_grid_nose(), Color.YELLOW, _target_regions.debug_marker_enabled(debug_config, "nose"))
 	_set_marker("LeftWrist", _input_manager.get_body_grid_left_wrist(), Color.BLACK, _target_regions.debug_marker_enabled(debug_config, "left_wrist"))
@@ -428,6 +429,60 @@ func _update_hud(message: String) -> void:
 func _update_camera_source_label() -> void:
 	if _camera_source_label != null and _camera_source != null:
 		_camera_source_label.text = _camera_source.status_text()
+
+func _song_load_error_text(load_result: Dictionary) -> String:
+	var message := String(load_result.get("message", "")).strip_edges()
+	if not message.is_empty():
+		return message
+	return String(load_result.get("error", "unknown"))
+
+func _camera_tracking_diagnostics_text(tracking_singleton: Node = null) -> String:
+	var singleton: Node = tracking_singleton if tracking_singleton != null else get_node_or_null("/root/AeroCameraTracking")
+	if singleton == null:
+		return "AeroCameraTracking: unavailable."
+	var ready := singleton.has_method("get_tracking_session_if_ready") and singleton.get_tracking_session_if_ready() != null
+	var cameras := _camera_list_text(singleton)
+	var error_info: Dictionary = {}
+	if singleton.has_method("get_last_error"):
+		error_info = singleton.get_last_error()
+	var error_text := _camera_error_text(error_info)
+	return "AeroCameraTracking ready: %s. Cameras: %s. Last error: %s" % [
+		"yes" if ready else "no",
+		cameras,
+		error_text,
+	]
+
+func _camera_list_text(tracking_singleton: Node) -> String:
+	var devices: Array = []
+	if tracking_singleton.has_method("get_available_camera_devices"):
+		devices = tracking_singleton.get_available_camera_devices()
+	elif tracking_singleton.has_method("list_cameras"):
+		devices = tracking_singleton.list_cameras()
+	if devices.is_empty():
+		return "none reported"
+	var labels: Array[String] = []
+	for device_variant in devices:
+		if device_variant is Dictionary:
+			var device := Dictionary(device_variant)
+			labels.append(String(device.get("id", device.get("name", JSON.stringify(device)))))
+		else:
+			labels.append(String(device_variant))
+	return ", ".join(labels)
+
+func _camera_error_text(error_info: Dictionary) -> String:
+	if error_info.is_empty():
+		return "none reported"
+	var raw_message: Variant = error_info.get("message", "")
+	if String(raw_message).strip_edges().is_empty():
+		raw_message = error_info.get("error", "")
+	if String(raw_message).strip_edges().is_empty():
+		raw_message = error_info.get("error_code", "")
+	if String(raw_message).strip_edges().is_empty():
+		raw_message = error_info.get("code", "")
+	var message := String(raw_message).strip_edges()
+	if message.is_empty():
+		message = JSON.stringify(error_info)
+	return message
 
 func _as_dict(value: Variant) -> Dictionary:
 	return value if value is Dictionary else {}

@@ -1,6 +1,6 @@
 extends "res://addons/aerobeat-vendor-godot-unit-test/test.gd"
 
-const GameplayInputStream := preload("res://addons/aerobeat-gameplay-runner/src/interfaces/gameplay_input_stream.gd")
+const GameplayInputStreamScript := preload("res://addons/aerobeat-gameplay-runner/src/interfaces/gameplay_input_stream.gd")
 const GameplayRunConfig := preload("res://addons/aerobeat-gameplay-runner/src/data_types/gameplay_run_config.gd")
 const GameplayRunState := preload("res://addons/aerobeat-gameplay-runner/src/data_types/gameplay_run_state.gd")
 const GameplaySession := preload("res://addons/aerobeat-gameplay-runner/src/runtime/gameplay_session.gd")
@@ -8,7 +8,7 @@ const BoxingInput := preload("res://addons/aerobeat-input-core/src/interfaces/bo
 const BodyCellInput := preload("res://addons/aerobeat-input-core/src/interfaces/body_cell_input.gd")
 const FlowInput := preload("res://addons/aerobeat-input-core/src/interfaces/flow_input.gd")
 const ContentPackageValidator := preload("res://addons/aerobeat-content-core/validators/content_package_validator.gd")
-const SimpleYamlParser := preload("res://addons/aerobeat-content-core/validators/simple_yaml_parser.gd")
+const SimpleYamlParserScript := preload("res://addons/aerobeat-content-core/validators/simple_yaml_parser.gd")
 const BoxingModeRunner := preload("res://addons/aerobeat-mode-boxing/src/boxing_mode_runner.gd")
 const FlowModeRunner := preload("res://addons/aerobeat-mode-flow/src/flow_mode_runner.gd")
 const FakeClock := preload("res://tests/support/fake_gameplay_clock.gd")
@@ -210,26 +210,26 @@ func test_fake_input_envelopes_mirror_input_core_signal_contracts() -> void:
 	]
 	for event in punch_events:
 		var envelope := FakeInputStream.boxing(event, 1.25)
-		assert_eq(envelope.contract, GameplayInputStream.CONTRACT_BOXING_V1)
+		assert_eq(envelope.contract, GameplayInputStreamScript.CONTRACT_BOXING_V1)
 		assert_eq(envelope.args, [])
-		assert_true(GameplayInputStream.is_valid_envelope(envelope))
+		assert_true(GameplayInputStreamScript.is_valid_envelope(envelope))
 
-	assert_true(GameplayInputStream.is_valid_envelope(FakeInputStream.body_cell("left_wrist_cell_entered", 1.5, 3, -1)))
-	assert_true(GameplayInputStream.is_valid_envelope(FakeInputStream.flow("squat_enabled", 1.75)))
-	assert_false(GameplayInputStream.is_valid_envelope(GameplayInputStream.make_envelope(GameplayInputStream.CONTRACT_BOXING_V1, "straight_left", 2.0, [0.8])))
+	assert_true(GameplayInputStreamScript.is_valid_envelope(FakeInputStream.body_cell("left_wrist_cell_entered", 1.5, 3, -1)))
+	assert_true(GameplayInputStreamScript.is_valid_envelope(FakeInputStream.flow("squat_enabled", 1.75)))
+	assert_false(GameplayInputStreamScript.is_valid_envelope(GameplayInputStreamScript.make_envelope(GameplayInputStreamScript.CONTRACT_BOXING_V1, "straight_left", 2.0, [0.8])))
 
 func test_testbed_composes_input_core_contracts_with_real_mode_engines() -> void:
 	var boxing_input := BoxingInput.new()
 	var body_cell_input := BodyCellInput.new()
 	var flow_input := FlowInput.new()
 
-	for event in GameplayInputStream.BOXING_PUNCH_EVENTS:
+	for event in GameplayInputStreamScript.BOXING_PUNCH_EVENTS:
 		assert_true(boxing_input.has_signal(event), "BoxingInput should expose %s" % event)
-	for event in GameplayInputStream.BOXING_STATE_EVENTS:
+	for event in GameplayInputStreamScript.BOXING_STATE_EVENTS:
 		assert_true(boxing_input.has_signal(event), "BoxingInput should expose %s" % event)
 	for event in ["left_wrist_cell_entered", "right_wrist_cell_entered", "nose_cell_entered"]:
 		assert_true(body_cell_input.has_signal(event), "BodyCellInput should expose %s" % event)
-	for event in GameplayInputStream.FLOW_EVENTS:
+	for event in GameplayInputStreamScript.FLOW_EVENTS:
 		assert_true(flow_input.has_signal(event), "FlowInput should expose %s" % event)
 
 	assert_eq(BoxingModeRunner.new().get_descriptor().mode_id, "boxing")
@@ -259,7 +259,7 @@ func test_full_run_regressions_run_tiny_fixtures_before_beatsaver_pool() -> void
 	assert_eq(tiny_boxing.judgements.size(), 2)
 	assert_eq(tiny_flow.judgements.size(), 2)
 
-	var parser := SimpleYamlParser.new()
+	var parser := SimpleYamlParserScript.new()
 	var validator := ContentPackageValidator.new()
 	var fixture_root := ProjectSettings.globalize_path("res://addons/aerobeat-content-core/fixtures/beatsaver_regression_pool")
 	var completed_ids: Array = []

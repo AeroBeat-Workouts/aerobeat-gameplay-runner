@@ -1,6 +1,6 @@
 extends RefCounted
 
-const SimpleYamlParser := preload("res://addons/aerobeat-content-core/validators/simple_yaml_parser.gd")
+const SimpleYamlParserScript := preload("res://addons/aerobeat-content-core/validators/simple_yaml_parser.gd")
 
 ## Runner testbed adapter for authored target footprints.
 ## Boxing transition regions prefer the input-camera-tracking gesture YAML and
@@ -119,7 +119,7 @@ func _load_yaml_dict(path: String) -> Dictionary:
 	var resolved := path
 	if path.begins_with("res://"):
 		resolved = ProjectSettings.globalize_path(path)
-	var parsed: Variant = SimpleYamlParser.new().parse_file(resolved)
+	var parsed: Variant = SimpleYamlParserScript.new().parse_file(resolved)
 	return parsed.duplicate(true) if parsed is Dictionary else {}
 
 func _as_dict(value: Variant) -> Dictionary:

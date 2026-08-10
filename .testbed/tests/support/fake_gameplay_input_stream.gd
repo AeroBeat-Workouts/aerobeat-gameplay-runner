@@ -1,6 +1,6 @@
 extends RefCounted
 
-const GameplayInputStream := preload("res://addons/aerobeat-gameplay-runner/src/interfaces/gameplay_input_stream.gd")
+const GameplayInputStreamScript := preload("res://addons/aerobeat-gameplay-runner/src/interfaces/gameplay_input_stream.gd")
 
 var events: Array[Dictionary] = []
 var cursor := 0
@@ -26,10 +26,10 @@ func poll_frame(position_sec: float) -> Array:
 	return due
 
 static func boxing(event: String, position_sec: float) -> Dictionary:
-	return GameplayInputStream.make_boxing_event(event, position_sec)
+	return GameplayInputStreamScript.make_boxing_event(event, position_sec)
 
 static func body_cell(event: String, position_sec: float, cell: int, direction: int) -> Dictionary:
-	return GameplayInputStream.make_body_cell_event(event, position_sec, cell, direction)
+	return GameplayInputStreamScript.make_body_cell_event(event, position_sec, cell, direction)
 
 static func flow(event: String, position_sec: float) -> Dictionary:
-	return GameplayInputStream.make_flow_event(event, position_sec)
+	return GameplayInputStreamScript.make_flow_event(event, position_sec)
