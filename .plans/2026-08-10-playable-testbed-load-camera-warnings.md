@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-10  
 **Status:** In Progress  
-**Last Updated:** 2026-08-10 16:05 EDT  
-**Blocked Reason:** None  
+**Last Updated:** 2026-08-10 15:57 EDT  
+**Blocked Reason:** Task 4 QA is blocked/failed on live-camera hardware and runtime noise; no `/dev/video*` devices are available, and camera provider registration/unregistration produced unexpected error noise during the playable workflow probe.
 **Agent:** pico
 
 ---
@@ -204,9 +204,24 @@ Because this touches Godot runtime scenes, validation must include a fresh open 
 **Files Created/Deleted/Modified:**
 - `.plans/2026-08-10-playable-testbed-load-camera-warnings.md`
 
-**Status:** ⏳ Pending
+**Status:** ❌ Blocked / Failed QA
 
-**Results:** Pending.
+**Results:** QA attempted 2026-08-10 15:57 EDT and the bead remains open. Evidence:
+- Highest-fidelity available runtime path was a non-headless Godot run on X11/Vulkan (`godot --path .testbed --script res://qa_playable_workflow_probe.gd` using a temporary QA probe that was removed after capture). The probe loaded:
+  - Flow scene `res://scenes/flow_playable_testbed.tscn` with `res://assets/songs/beatsaver_regression_pool/47fb6/song.package.yaml`: HUD reported `Loaded flow Normal chart with 3 events`.
+  - Boxing scene `res://scenes/boxing_playable_testbed.tscn` with `res://assets/songs/beatsaver_regression_pool/3d44b/song.package.yaml`: HUD reported `Loaded boxing Normal chart with 3 events`.
+  - Environment descriptors `ab-environment-image-demo.yaml`, `ab-environment-video-demo.yaml`, `ab-environment-glb-demo.yaml`, and `ab-environment-splat-demo.yaml`: HUD reported `Environment ready: image`, `Environment ready: video`, `Environment ready: glb`, and `Environment ready: splat` in both scenes.
+  - Live camera selection `0` and calibration attempt in both scenes: HUD reported `Calibration request unavailable. AeroCameraTracking ready: yes. Cameras: none reported. Last error: No live camera candidates were found during MediaPipe Python probe`.
+- Hardware blocker: `find /dev -maxdepth 2 \( -name 'video*' -o -name 'media*' \) -print` and `ls -l /dev/video*` returned no live camera devices, so a real camera provider/calibration pass could not be validated.
+- Unexpected warning/error noise blocks QA under the zero-noise gate:
+  - `/tmp/aerobeat-runner-qa-playable-probe-cleanup.log` ended with `WARNING: ObjectDB instances leaked at exit` and `ERROR: 7 resources still in use at exit` after live-camera provider registration was attempted.
+  - `/tmp/aerobeat-runner-qa-playable-probe-final.log` showed that calling the scene's normal provider unregister path after registration emits repeated `ERROR: Cannot disconnect from '<signal>': the provided callable is null` from `res://addons/aerobeat-input-core/src/input_manager.gd:507`, followed by the same leak/resource errors.
+- Clean baseline validation still passed:
+  - `godot --headless --path .testbed --import > /tmp/aerobeat-runner-qa-import.log 2>&1` exited 0; noise scan found no warning/error matches.
+  - `godot --headless --path .testbed --script res://addons/aerobeat-vendor-godot-unit-test/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit > /tmp/aerobeat-runner-qa-gut.log 2>&1` exited 0; 25/25 tests passed; noise scan found no warning/error matches.
+  - `godot --path .testbed --quit-after 2 res://scenes/flow_playable_testbed.tscn > /tmp/aerobeat-runner-qa-flow-runtime.log 2>&1` exited 0; noise scan found no warning/error matches.
+  - `godot --path .testbed --quit-after 2 res://scenes/boxing_playable_testbed.tscn > /tmp/aerobeat-runner-qa-boxing-runtime.log 2>&1` exited 0; noise scan found no warning/error matches.
+- Editor-control stop evidence is missing because the Godot editor-control MCP tool was not available in this subagent session; runtime scene launch/quit evidence is included above, but this does not satisfy the requested editor play/stop workflow.
 
 ---
 
