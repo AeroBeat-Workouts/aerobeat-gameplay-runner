@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-10  
 **Status:** In Progress  
-**Last Updated:** 2026-08-10 11:53 EDT  
+**Last Updated:** 2026-08-10 11:55 EDT  
 **Blocked Reason:** None  
 **Agent:** pico
 
@@ -169,9 +169,38 @@ Validation evidence:
 **Files Created/Deleted/Modified:**
 - `.plans/2026-08-10-testbed-song-environment-assets.md`
 
-**Status:** ⏳ Pending
+**Status:** ✅ Complete
 
-**Results:** Pending.
+**Results:** QA passed. The `.testbed` addons were already present as the expected symlink-backed GodotEnv addon set, so no refresh/install was needed.
+
+Validation commands and logs:
+
+- `godot --headless --path .testbed --import > /tmp/aerobeat_gameplay_runner_qa_import.log 2>&1` passed with exit code 0.
+- `godot --headless --path .testbed --script addons/aerobeat-vendor-godot-unit-test/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit > /tmp/aerobeat_gameplay_runner_qa_gut.log 2>&1` passed with exit code 0: 20/20 tests and 206 assertions.
+- Temporary highest-fidelity asset-access validation script run with `godot --headless --path .testbed --script res://tests/qa_asset_access_validation.gd > /tmp/aerobeat_gameplay_runner_qa_asset_access.log 2>&1` passed with exit code 0. The temporary script was removed after recording evidence and was not left in the repo.
+- Fresh runtime/editor log inspected at `$HOME/.local/share/godot/app_userdata/AeroBeat Gameplay Runner Testbed/logs/godot.log`.
+- Noise scan command `rg -n "(?i)(warning|error|failed|missing|parse error|script error|import.*fail|can't|cannot)" /tmp/aerobeat_gameplay_runner_qa_import.log /tmp/aerobeat_gameplay_runner_qa_gut.log /tmp/aerobeat_gameplay_runner_qa_asset_access.log` returned no matches.
+- Noise scan command `rg -n "(?i)(warning|error|failed|missing|parse error|script error|import.*fail|can't|cannot)" "$HOME/.local/share/godot/app_userdata/AeroBeat Gameplay Runner Testbed/logs/godot.log"` returned no matches.
+
+Fixture access evidence:
+
+- Verified `res://assets/songs` and `res://assets/environments/workout_yaml_valid_all_kinds` are visible from the testbed project.
+- Verified `res://scenes/boxing_playable_testbed.tscn` and `res://scenes/flow_playable_testbed.tscn` load as `PackedScene` and instantiate in a fresh headless testbed scene run.
+- Verified all copied song packages are visible, validate through `ContentPackageValidator.validate_song_package_yaml_package(...)`, parse through `SimpleYamlParser`, expose visible chart YAML files, and load through `.testbed/scripts/playable_content_loader.gd` for their runner mode:
+  - `res://assets/songs/song_package_yaml_valid_splat_with_preview_audio/song.package.yaml` for boxing.
+  - `res://assets/songs/beatsaver_regression_pool/226e/song.package.yaml` for boxing.
+  - `res://assets/songs/beatsaver_regression_pool/29be2/song.package.yaml` for flow.
+  - `res://assets/songs/beatsaver_regression_pool/3d44b/song.package.yaml` for boxing.
+  - `res://assets/songs/beatsaver_regression_pool/47fb6/song.package.yaml` for flow.
+- Confirmed those copied song package YAML files still point at upstream-placeholder audio paths that are not committed in the source fixtures; the runner content-loader path/parse validation succeeds and audio playback was not treated as available for those YAML-only contract fixtures.
+- Verified `res://assets/environments/workout_yaml_valid_all_kinds/workout.yaml` is visible.
+- Verified all copied environment YAML files parse and every runner-local `resourcePath`/`configPath` target resolves:
+  - Image `resourcePath` resolves to `res://assets/environments/workout_yaml_valid_all_kinds/media/images/perfect-hue-may-14-2026/perfect-hue-may-14-2026.png`.
+  - Video `resourcePath` resolves to `res://assets/environments/workout_yaml_valid_all_kinds/media/videos/calm_blue_sea_1/calm_blue_sea_1.ogv`.
+  - GLB `resourcePath` resolves to `res://assets/environments/workout_yaml_valid_all_kinds/media/models/alien-moon-icescape/alien-moon-icescape.glb`.
+  - GLB `configPath` resolves to `res://assets/environments/workout_yaml_valid_all_kinds/media/models/alien-moon-icescape/alien-moon-icescape.config.yaml`.
+  - Splat `resourcePath` resolves to `res://assets/environments/workout_yaml_valid_all_kinds/media/splats/countryside-farm/countryside-farm.compressed.ply`.
+- Verified the copied image, video, GLB, and splat media load through `.testbed/scripts/environment_loader_adapter.gd` and the real `AeroEnvironmentLoader` from runner-local `res://assets/...` paths, each reaching `environment_load_succeeded`.
 
 ---
 
