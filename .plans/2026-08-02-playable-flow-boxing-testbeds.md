@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-02  
 **Status:** Blocked  
-**Last Updated:** 2026-08-10 08:24 EDT
-**Blocked Reason:** Task 8 fixed the runner-owned startup parse errors by restoring the missing camera-recording testbed dependency; final closure remains blocked on `aerobeat-gameplay-runner-an1` until Derrick manually observes a real playable session proving calibration/playback, overlays, audio/gameplay sync, hits/misses, recalibration, completion summary, environment display, and first-person cells `0/3/8/11`. Environment-owned splat-display follow-up remains tracked by `aerobeat-tool-environment-1ds`.
+**Last Updated:** 2026-08-10 09:14 EDT
+**Blocked Reason:** Task 8 fixed the runner-owned startup parse errors by restoring the missing camera-recording testbed dependency. Task 11 is cleaning the remaining GUT vendor UID fallback warnings now that QA/audit zero-noise rules are frozen. Final closure remains blocked on `aerobeat-gameplay-runner-an1` until Derrick manually observes a real playable session proving calibration/playback, overlays, audio/gameplay sync, hits/misses, recalibration, completion summary, environment display, and first-person cells `0/3/8/11`. Environment-owned splat-display follow-up remains tracked by `aerobeat-tool-environment-1ds`.
 **Agent:** pico
 
 ---
@@ -41,6 +41,7 @@ Spatial behavior must be grid-driven. The play area is defined by translating th
 | `REF-11` | Public YAML documentation/comment style for runtime tuning assets | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-camera-tracking/assets/flow.gesture_detection.yaml`, `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-camera-tracking/assets/boxing.gesture_detection.yaml`, `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-camera-tracking/assets/flow.testbed_debug.yaml`, `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-camera-tracking/assets/boxing.testbed_debug.yaml` |
 | `REF-12` | Proposed first-class normalized body-grid pose contract | `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/.plans/2026-08-02-normalized-body-grid-pose-contract.md` |
 | `REF-13` | Derrick screenshot of gameplay runner testbed startup warnings/errors | `/home/derrick/.openclaw/workspace/.temp/nerve-uploads/2026/08/10/image-4f11017b.png` |
+| `REF-14` | Derrick screenshot of remaining GUT vendor UID fallback warnings | `/home/derrick/.openclaw/workspace/.temp/nerve-uploads/2026/08/10/image-1ae9606d.png` |
 
 ---
 
@@ -508,6 +509,33 @@ Targeted log inspection found no `SessionManifestV1`, `SavedSessionValidator`, `
 The fix is appropriate for runner ownership: `.testbed/addons.jsonc` restores `aerobeat-tool-camera-recording` from the local sibling repo with `url: "../../aerobeat-tool-camera-recording"`, `source: "symlink"`, and `subfolder: "/"`. No generated addon files are tracked (`git ls-files .testbed/addons` returned empty). The installed symlink exposes the screenshot-missing preload targets required by `aerobeat-tool-camera-tracking`: `SessionManifestV1.gd`, `SavedSessionValidator.gd`, and `PoseFrameRecord.gd`; targeted search confirmed `SessionManifestReplayBackend.gd` and `SavedSessionReplayBackend.gd` preload those exact paths.
 
 QA evidence is sufficient for the startup cleanup scope. Task 9 and bead `aerobeat-gameplay-runner-6xb` record passing GodotEnv sync, headless import, full runner GUT (`4` scripts, `20` tests, `206` assertions), fresh non-headless Flow and Boxing opens, class-name scan with `0` collisions, and `git diff --check`. QA targeted log inspection found no `SessionManifestV1`, `SavedSessionValidator`, `PoseFrameRecord`, camera-tracking preload, parse, script, runner, or tool errors. The remaining GUT invalid UID fallback lines and Godot ObjectDB import-exit leak warning are accepted third-party/vendor/import-exit noise, do not appear in fresh Flow/Boxing runtime opens, and are not hiding the reported startup errors. `git diff --check` passed during audit. Bead `aerobeat-gameplay-runner-bvw` may close; parent `aerobeat-gameplay-runner-an1` remains open because the full human-observed manual/high-fidelity gate has not passed.
+
+---
+
+### Task 11: Clean GUT Vendor UID Warning Noise
+
+**Bead ID:** `aerobeat-gameplay-runner-08f`
+**SubAgent:** `primary` (for `coder` / `qa` / `auditor` workflow roles)
+**Role:** `coder` → `qa` → `auditor`
+**References:** `REF-01`, `REF-14`
+**Prompt:** Claim bead `aerobeat-gameplay-runner-08f` on start. Read the runner README and the GUT vendor README before touching repos. Clean the remaining GUT vendor UID fallback warnings shown in `REF-14` at the owning source in `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-vendor-godot-unit-test`, not in generated runner `.testbed/addons/` state. Remove stale invalid external-resource UID references while preserving path/id scene references, refresh the runner testbed with `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo .testbed --install --scrub-uids`, rerun import/GUT/fresh Flow and Boxing scene-open validation with log inspection, update the plan and bead with evidence, commit and push touched repos, then sync Cookie's AeroBeat repos after the fix lands.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-vendor-godot-unit-test/`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/.testbed/`
+
+**Files Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-vendor-godot-unit-test/GutScene.tscn`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-vendor-godot-unit-test/UserFileViewer.tscn`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-vendor-godot-unit-test/gui/*.tscn`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-vendor-godot-unit-test/gui/GutSceneTheme.tres`
+- `.plans/2026-08-02-playable-flow-boxing-testbeds.md` - records the zero-noise cleanup task.
+
+**Status:** Coder complete; ready for QA/audit.
+
+**Results:** Coder removed stale `uid="uid://..."` attributes from all GUT vendor `.tscn`/`.tres` `ext_resource` lines while preserving `type`, `path`, and `id` references. The cleanup covered 50 external-resource references across `GutScene.tscn`, `UserFileViewer.tscn`, and the GUT `gui/` scenes/resource, including the REF-14 warning files (`GutScene.tscn`, `NormalGui.tscn`, `ResizeHandle.tscn`, `MinGui.tscn`, `RunExternally.tscn`).
+
+Validation passed: `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo .testbed --install --scrub-uids`, `godot --headless --path .testbed --import --quit`, full runner GUT (`4` scripts, `20` tests, `206` assertions), fresh headless Flow scene open, fresh headless Boxing scene open, fresh non-headless Flow scene open, fresh non-headless Boxing scene open, and `git diff --check` in both runner and vendor repos. Targeted log inspection across import/GUT/Flow/Boxing logs found no `invalid UID`, `Failed to load resource: UID`, `uid://`, parse, script, camera-tracking preload, or runner/tool error lines; only the pre-existing Godot ObjectDB import-exit leak warning remains in the headless import log. Cookie was not synced per parent-orchestrator instruction.
 
 ---
 
