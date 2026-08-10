@@ -255,7 +255,7 @@ Because this touches Godot runtime scenes, validation must include a fresh open 
 
 **Commits Pushed:**
 - `aerobeat-input-core` `728d361` - Fix provider signal cleanup
-- `aerobeat-gameplay-runner` `b39fe33` - Clean live camera provider unregister noise
+- `aerobeat-gameplay-runner` `7695aa4` - Clean live camera provider unregister noise
 
 **Validation:**
 - No camera hardware available: `find /dev -maxdepth 2 \( -name 'video*' -o -name 'media*' \) -print` returned no devices; `ls -l /dev/video*` returned `No such file or directory`.
