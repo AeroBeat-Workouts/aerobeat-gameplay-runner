@@ -463,6 +463,50 @@ Validation passed: GodotEnv sync, headless import smoke, runner full GUT (`20` t
 
 ---
 
+### Task 9: QA Gameplay Runner Testbed Startup Cleanup
+
+**Bead ID:** `aerobeat-gameplay-runner-6xb`
+**SubAgent:** `primary` (for `qa` workflow role)
+**Role:** `qa`
+**References:** `REF-01`, `REF-13`
+**Prompt:** Claim bead `aerobeat-gameplay-runner-6xb` on start. Read the runner README before touching the repo. Verify commit `682aa90` fixed the gameplay runner testbed startup warnings/errors from Derrick's screenshot. Confirm GodotEnv restore includes `aerobeat-tool-camera-recording`, fresh Flow/Boxing opens no longer show camera-tracking preload/parse errors, runner GUT/import checks remain green, class-name scan remains clean, and any remaining GUT invalid UID/ObjectDB warnings are truthfully classified. Update this plan and bead notes with QA evidence, close the bead only if QA passes, and leave `aerobeat-gameplay-runner-an1` open unless the full manual/high-fidelity gate passes.
+
+**Folders Created/Deleted/Modified:**
+- `.plans/`
+
+**Files Created/Deleted/Modified:**
+- `.plans/2026-08-02-playable-flow-boxing-testbeds.md` - records Task 9 QA evidence and pass decision.
+
+**Status:** ✅ QA Passed
+
+**Results:** QA passed at commit `682aa90`. The `.testbed/addons.jsonc` diff restores `aerobeat-tool-camera-recording` as a local sibling symlink dependency (`url: "../../aerobeat-tool-camera-recording"`, `source: "symlink"`, `subfolder: "/"`), and `/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo .testbed --install --scrub-uids` resolved it from `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-tool-camera-recording` without requiring generated addon edits or pruning generated cache state. The installed symlink exposes the three screenshot-missing files at `res://addons/aerobeat-tool-camera-recording/src/manifest/SessionManifestV1.gd`, `src/validation/SavedSessionValidator.gd`, and `src/pose/PoseFrameRecord.gd`.
+
+Validation passed: GodotEnv sync, `godot --headless --path .testbed --import --quit`, full runner GUT (`4` scripts, `20` tests, `206` assertions), fresh non-headless Flow open (`godot --path .testbed --scene res://scenes/flow_playable_testbed.tscn --quit-after 5`), fresh non-headless Boxing open (`godot --path .testbed --scene res://scenes/boxing_playable_testbed.tscn --quit-after 5`), `/home/derrick/.openclaw/workspace/scripts/scan-godot-class-names --repo /home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner` (`0` collisions; blocker=0, warn_embedded_overlap=0, warn_root_nonruntime=0, info_hidden_testbed=0), and `git diff --check`.
+
+Targeted log inspection found no `SessionManifestV1`, `SavedSessionValidator`, `PoseFrameRecord`, camera-tracking preload, parse, script, or runner/tool errors in sync/import/GUT/Flow/Boxing logs. Remaining warnings are limited to the accepted third-party `aerobeat-vendor-godot-unit-test` invalid UID fallback lines during headless import plus Godot's ObjectDB import-exit leak warning; the UID warnings fall back to text paths inside the GUT vendor addon and are not present in fresh Flow/Boxing runtime opens. `aerobeat-gameplay-runner-an1` remains open because this QA did not run the full human-observed manual/high-fidelity gate.
+
+---
+
+### Task 10: Audit Gameplay Runner Testbed Startup Cleanup
+
+**Bead ID:** `aerobeat-gameplay-runner-bvw`
+**SubAgent:** `primary` (for `auditor` workflow role)
+**Role:** `auditor`
+**References:** `REF-01`, `REF-13`
+**Prompt:** Claim bead `aerobeat-gameplay-runner-bvw` on start after `aerobeat-gameplay-runner-6xb` closes. Read the runner README before touching the repo. Independently audit the startup warning/error cleanup against the bead, plan, commit diff, dependency manifest, validation evidence, and repo status. Close only if startup parse errors are fixed without generated addon edits and remaining warnings are accepted/source-owned. Update plan/beads and push Beads as needed. Leave `aerobeat-gameplay-runner-an1` open unless the full manual/high-fidelity gate passes.
+
+**Folders Created/Deleted/Modified:**
+- Pending
+
+**Files Created/Deleted/Modified:**
+- Pending
+
+**Status:** ⏳ Pending
+
+**Results:** Pending.
+
+---
+
 ## Final Results
 
 **Status:** ❌ Blocked / Waiting on Manual Test
