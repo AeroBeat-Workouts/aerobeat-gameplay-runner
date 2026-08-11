@@ -1,9 +1,9 @@
 # AeroBeat Gameplay Runner Godot Editor QA Gate Repair
 
 **Date:** 2026-08-11  
-**Status:** In Progress  
-**Last Updated:** 2026-08-11 09:24 EDT  
-**Blocked Reason:** None  
+**Status:** Blocked  
+**Last Updated:** 2026-08-11 09:47 EDT  
+**Blocked Reason:** Godot gateway plugin is enabled and loaded, but it still advertises `toolNames: []`; `tool_search` does not expose `godot_execute`, so real-editor QA cannot proceed until the OpenClaw LTS plugin tool-registration/bridge issue is fixed or explicitly bypassed by Derrick.
 **Agent:** pico
 
 ---
@@ -76,9 +76,9 @@ Derrick approved the plan and confirmed the likely root cause is the OpenClaw LT
 **Files Created/Deleted/Modified:**
 - Gateway/plugin config files if needed
 
-**Status:** ⚠️ Partial / In Progress
+**Status:** ⚠️ Partial / Blocked
 
-**Results:** Installed/restored the Godot gateway extension files under `/home/derrick/.openclaw/extensions/godot/`, updated `/home/derrick/.openclaw/config/openclaw.template.json` to allow and enable the `godot` plugin, regenerated `/home/derrick/.openclaw/openclaw.json`, and performed a narrow gateway restart. `openclaw plugins list --enabled` now shows `Godot Plugin` enabled from `global:godot/index.ts`, and `openclaw godot status` reports the plugin loaded its `/godot/*` HTTP endpoints. Remaining blocker: the enabled plugin advertises `toolNames: []` in `openclaw plugins list --enabled --json`, this Codex session's `tool_search` still does not expose `godot_execute`, and `openclaw godot status` reports no connected Godot sessions. That points to an OpenClaw LTS plugin SDK/tool-registration compatibility gap in the Godot extension, not only a missing editor session. Keep bead `aerobeat-gameplay-runner-l9i` open until a fresh agent/tool surface can call `godot_execute` and verify `scene.open`, `console.getLogs`, `editor.play`, and `editor.stop` against a connected editor, or until the exact remaining OpenClaw/Codex bridge blocker is isolated.
+**Results:** Installed/restored the Godot gateway extension files under `/home/derrick/.openclaw/extensions/godot/`, updated `/home/derrick/.openclaw/config/openclaw.template.json` to allow and enable the `godot` plugin, regenerated `/home/derrick/.openclaw/openclaw.json`, and performed a narrow gateway restart. `openclaw plugins list --enabled` now shows `Godot Plugin` enabled from `global:godot/index.ts`, and `openclaw godot status` reports the plugin loaded its `/godot/*` HTTP endpoints. Remaining blocker, rechecked at 2026-08-11 09:47 EDT: the enabled plugin advertises `toolNames: []` in `openclaw plugins list --enabled --json`, this Codex session's `tool_search` still does not expose `godot_execute`, and `openclaw godot status` does not return usable connected-editor evidence. That points to an OpenClaw LTS plugin SDK/tool-registration compatibility gap in the Godot extension, not only a missing editor session. Keep bead `aerobeat-gameplay-runner-l9i` open until a fresh agent/tool surface can call `godot_execute` and verify `scene.open`, `console.getLogs`, `editor.play`, and `editor.stop` against a connected editor, or until the exact remaining OpenClaw/Codex bridge blocker is isolated.
 
 ---
 
@@ -189,7 +189,7 @@ Derrick approved the plan and confirmed the likely root cause is the OpenClaw LT
 
 ## Final Results
 
-**Status:** ⚠️ In Progress
+**Status:** ❌ Blocked
 
 **What We Built:** Derrick approved the repair plan and execution beads were created/dependency-linked. Gateway-side Godot plugin install/config was restored, and the QA/audit gate was tightened so CLI-only Godot evidence cannot satisfy a real-editor fresh-open requirement. The actual `godot_execute` Codex tool surface and connected editor validation remain blocked.
 
