@@ -3,7 +3,7 @@ config_version=5
 [application]
 
 config/name="AeroBeat Gameplay Runner Testbed"
-run/main_scene="res://scenes/gameplay_runner_testbed.tscn"
+run/main_scene="res://scenes/flow_playable_testbed.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 
 [autoload]
