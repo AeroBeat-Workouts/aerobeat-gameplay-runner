@@ -244,6 +244,10 @@ Task 2 readiness audit initially returned `BLOCKED`; the blockers were promoted 
 
 Before QA and audit can pass, the coder/QA evidence must include:
 
+- For the required Godot runtime-scene/editor path checks, actual editor-control evidence via `godot_execute`/OpenClaw Godot tooling, or a Derrick-approved case-specific exception recorded in this plan and the bead before QA/audit passes.
+- CLI-only evidence such as headless import, GUT tests, `--quit-after`, direct probes, and command-line scene launches is useful supporting evidence, but cannot satisfy the real-editor fresh-open gate by itself.
+- Each real-editor fresh-open evidence item must include the exact scene path opened and either an editor Errors panel screenshot/log capture or `console.getLogs` after opening that scene.
+- Unexpected warnings/errors fail by default unless Derrick has approved the exact warning/error as a case-specific exception and the plan/bead records that exception with evidence.
 - Fresh open of Boxing playable scene in Godot and clean editor/runtime logs.
 - Fresh open of Flow playable scene in Godot and clean editor/runtime logs.
 - Camera source selection happens during the calibration/setup step before gameplay starts, before `InputManager` provider startup is probed.
