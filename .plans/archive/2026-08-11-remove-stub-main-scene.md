@@ -73,7 +73,7 @@ This slice removes the stub scene and repoints `.testbed/project.godot` to `res:
 - `godot --headless --path .testbed --script addons/aerobeat-vendor-godot-unit-test/gut_cmdln.gd -gtest=res://tests/test_playable_content_loader.gd -gexit` — passed, 2/2 tests.
 - Log scan across the passing import, scene-open, direct scene-load, and GUT logs found no unexpected `warning`, `error`, `script error`, `parse error`, `ObjectDB`, `leak`, or `resource` noise.
 
-**Commits:** `Remove stub gameplay runner main scene`; final hash reported in handoff after amend.
+**Commits:** `dd74a78` - Remove stub gameplay runner main scene.
 
 **Lessons Learned:** A focused import plus explicit Flow scene load is sufficient for this scene-pointer deletion, and the nearby playable-content GUT test is quick enough to include as an extra regression check.
 
