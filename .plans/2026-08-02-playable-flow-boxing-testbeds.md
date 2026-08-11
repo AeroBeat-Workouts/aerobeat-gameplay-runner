@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-02  
 **Status:** Blocked  
-**Last Updated:** 2026-08-10 11:28 EDT
+**Last Updated:** 2026-08-11 06:35 EDT
 **Blocked Reason:** Task 8 fixed the runner-owned startup parse errors by restoring the missing camera-recording testbed dependency. Task 11 removed the remaining GUT vendor UID fallback warnings at the owning vendor source. Task 12 removed the remaining ObjectDB import-exit warning by updating the owning GUT vendor plugin headless-import path in commit `99f1939`, and zero-noise import/GUT/scene-open validation now passes. Final closure remains blocked on `aerobeat-gameplay-runner-an1` until Derrick manually observes a real playable session proving calibration/playback, overlays, audio/gameplay sync, hits/misses, recalibration, completion summary, environment display, and first-person cells `0/3/8/11`. Environment-owned splat-display follow-up remains tracked by `aerobeat-tool-environment-1ds`.
 **Agent:** pico
 
@@ -575,13 +575,35 @@ Bead `aerobeat-gameplay-runner-08f` is closed with the same owning-source eviden
 
 Cookie was also refreshed after the cleanup landed: AeroBeat git sync succeeded, GodotEnv sync reported `68 ok, 0 failed`, a generated `.testbed/project.godot` diff in Cookie's runner checkout was restored to synced state, and a final direct AeroBeat repo sweep reported 73 clean repos.
 
+### Task 13: Focused Live-Camera Regression Scene Check
+
+**Bead ID:** `aerobeat-gameplay-runner-an1`
+**SubAgent:** `primary` (for `qa` workflow role)
+**Role:** `qa`
+**References:** `REF-01`, `REF-05`, `REF-08`
+**Prompt:** Resume the active manual-gate bead and test the gameplay runner testbed scene path with a regression AeroBeat song package and the live camera path. Prefer the actual high-fidelity playable scenes if the legacy `gameplay_runner_testbed.tscn` scene is only a stub. Select live camera `0`, load matching BeatSaver regression song packages, attempt camera provider registration/calibration through the scene/harness path, inspect logs for unexpected warning/error/leak noise, and leave `aerobeat-gameplay-runner-an1` open unless true live-camera gameplay is fully proven.
+
+**Folders Created/Deleted/Modified:**
+- None durably.
+
+**Files Created/Deleted/Modified:**
+- `.plans/2026-08-02-playable-flow-boxing-testbeds.md` - records this focused QA evidence.
+
+**Status:** ⚠️ Partial; scene path clean, true camera capture hardware-blocked.
+
+**Results:** Focused local QA on 2026-08-11 used a temporary probe, removed before handoff, to open the actual high-fidelity playable scene pair. The legacy `res://scenes/gameplay_runner_testbed.tscn` was confirmed to instantiate only `GameplayRunnerTestbed:Node`, so the meaningful scene path for this manual-gate regression is `res://scenes/flow_playable_testbed.tscn` and `res://scenes/boxing_playable_testbed.tscn`.
+
+Validation ran non-headless with Godot `4.6.2.stable.official.71f334935` on X11/Vulkan. The Flow scene loaded `res://assets/songs/beatsaver_regression_pool/47fb6/song.package.yaml`, reported `content_ok=true`, built `3` targets and `3` target node entries, selected `Live camera: 0`, registered `camera_tracking` as the active provider, and loaded the image environment through the environment adapter. The Boxing scene loaded `res://assets/songs/beatsaver_regression_pool/3d44b/song.package.yaml`, reported `content_ok=true`, built `3` targets and `3` target node entries, selected `Live camera: 0`, registered `camera_tracking` as the active provider, and loaded the same image environment path.
+
+The probe exited `0`, and targeted log scanning found no `WARNING`, `ERROR`, `SCRIPT ERROR`, `Parse Error`, `ObjectDB`, `leak`, or `resource` matches. Hardware inspection still found no `/dev/video*` or `/dev/media*` devices on this host, and `AeroCameraTracking` reported `devices=[]` with last error `no_live_cameras_found` / `No live camera candidates were found during MediaPipe Python probe`. Therefore true live-camera frames, T-pose success, playback start, hits/misses, recalibration, completion summary, and human-observed cell placement remain unproven. Parent bead `aerobeat-gameplay-runner-an1` remains open for the full manual/high-fidelity gate.
+
 ---
 
 ## Final Results
 
 **Status:** ❌ Blocked / Waiting on Manual Test
 
-**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is committed and pushed, coder follow-up fixes for the static QA blockers are committed and pushed, and the static/headless QA retry passed. The stale runner camera/replay startup blocker was addressed by Task 4 in commit `987d1bd`; Task 5 QA retry passed at `c550f76`; Task 6 audit confirmed the code and runtime-open gates were clean but blocked final closure on live/manual proof. Task 7 fixed the later typed target and replay provider registration blockers in commits `0ff2522` and `3a12f49`, and recreated high-fidelity replay/song validation now passes for Flow and Boxing. Task 8 fixed the startup parse errors in the gameplay runner testbed by restoring the missing `aerobeat-tool-camera-recording` dependency required by `aerobeat-tool-camera-tracking` replay backends; fresh Flow and Boxing opens are clean. Tasks 11 and 12 cleaned the remaining GUT vendor UID and ObjectDB import-exit warning noise at the owning vendor source; zero-noise import, GUT, and fresh scene-open validation now passes. Derrick confirmed the next step is manual testing and feedback in the next AeroBeat session. Environment-loader splat display remains tracked as environment-owned follow-up `aerobeat-tool-environment-1ds`.
+**What We Built:** Frozen implementation plan plus independent readiness audit. Input-core and camera-tracking prerequisite seams are implemented, QA/audited, committed, and pushed. Runner implementation is committed and pushed, coder follow-up fixes for the static QA blockers are committed and pushed, and the static/headless QA retry passed. The stale runner camera/replay startup blocker was addressed by Task 4 in commit `987d1bd`; Task 5 QA retry passed at `c550f76`; Task 6 audit confirmed the code and runtime-open gates were clean but blocked final closure on live/manual proof. Task 7 fixed the later typed target and replay provider registration blockers in commits `0ff2522` and `3a12f49`, and recreated high-fidelity replay/song validation now passes for Flow and Boxing. Task 8 fixed the startup parse errors in the gameplay runner testbed by restoring the missing `aerobeat-tool-camera-recording` dependency required by `aerobeat-tool-camera-tracking` replay backends; fresh Flow and Boxing opens are clean. Tasks 11 and 12 cleaned the remaining GUT vendor UID and ObjectDB import-exit warning noise at the owning vendor source; zero-noise import, GUT, and fresh scene-open validation now passes. Task 13 confirmed the real playable scenes can load matching BeatSaver regression packages and register the live-camera provider path cleanly on this host, but true camera capture remains blocked because the OS exposes no camera device. Derrick confirmed the next step is manual testing and feedback in the next AeroBeat session. Environment-loader splat display remains tracked as environment-owned follow-up `aerobeat-tool-environment-1ds`.
 
 **Reference Check:** Subagent reviews completed against referenced repos. The final readiness audit passed after freeze edits and closed `aerobeat-gameplay-runner-7l8`.
 
