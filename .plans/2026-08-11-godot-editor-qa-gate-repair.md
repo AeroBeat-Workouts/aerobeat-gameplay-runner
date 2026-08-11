@@ -58,7 +58,7 @@ Derrick approved the plan and confirmed the likely root cause is the OpenClaw LT
 - The screenshot warnings include duplicate global-class/preload-name warnings and static GDScript warnings, so the real editor path is still noisy.
 - Heartbeat sync checkpoint at 2026-08-11 09:50 EDT: Cookie fast-forwarded `aerobeat-gameplay-runner` to `origin/main`, and GodotEnv sync completed. Cookie still has a local tracked `.testbed/project.godot` editor rewrite: the Godot header block was added and `[rendering] renderer/rendering_method="forward_plus"` was removed. This is local Cookie editor state and was left untouched while Derrick may be testing there.
 - Heartbeat blocker recheck at 2026-08-11 10:17 EDT: `tool_search` still does not expose `godot_execute`; `openclaw plugins list --enabled --json` still reports `godot` loaded with `toolNames: []`; `openclaw godot status` reports the plugin HTTP endpoints are loaded but no Godot sessions are connected. The Task 1 blocker remains current.
-- Heartbeat sync checkpoint at 2026-08-11 10:21 EDT: Cookie fast-forwarded `aerobeat-gameplay-runner` to `e42469e`, GodotEnv sync completed, and the only remaining Cookie repo dirt is the same tracked `.testbed/project.godot` editor rewrite. That local editor state remains intentionally untouched while Derrick is testing on Cookie.
+- Heartbeat sync checkpoint at 2026-08-11 10:21 EDT: Cookie fast-forwarded `aerobeat-gameplay-runner` to `origin/main`, GodotEnv sync completed, and the only remaining Cookie repo dirt is the same tracked `.testbed/project.godot` editor rewrite. That local editor state remains intentionally untouched while Derrick is testing on Cookie.
 
 ---
 
